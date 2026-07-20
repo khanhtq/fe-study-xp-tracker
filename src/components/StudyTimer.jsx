@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { sessionApi } from '../api';
+import { sessionApi, getServerClientOffset } from '../api';
 import { Play, Square, BookOpen, Clock, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,10 +16,10 @@ export default function StudyTimer({ onStopResult }) {
   useEffect(() => {
     if (activeSession) {
       setSubject(activeSession.subject || '');
-      // Calculate elapsed time from server start time
+      // Calculate elapsed time from server start time adjusted for server-client clock drift
       const calculateElapsed = () => {
-        const start = new Date(activeSession.startedAt);
-        const now = new Date();
+        const start = new Date(activeSession.startedAt).getTime();
+        const now = Date.now() - getServerClientOffset();
         const diff = Math.max(0, Math.floor((now - start) / 1000));
         setSeconds(diff);
       };
@@ -28,8 +28,8 @@ export default function StudyTimer({ onStopResult }) {
       
       // Update timer every second
       timerRef.current = setInterval(() => {
-        const start = new Date(activeSession.startedAt);
-        const now = new Date();
+        const start = new Date(activeSession.startedAt).getTime();
+        const now = Date.now() - getServerClientOffset();
         setSeconds(Math.max(0, Math.floor((now - start) / 1000)));
       }, 1000);
     } else {

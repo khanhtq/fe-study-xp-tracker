@@ -11,6 +11,10 @@ const getHeaders = () => {
   return headers;
 };
 
+let serverClientOffset = 0;
+
+export const getServerClientOffset = () => serverClientOffset;
+
 export const apiCall = async (endpoint, options = {}) => {
   const url = `${BASE_URL}${endpoint}`;
   const headers = { ...getHeaders(), ...options.headers };
@@ -19,6 +23,20 @@ export const apiCall = async (endpoint, options = {}) => {
     ...options,
     headers,
   });
+
+  // Extract server date header for clock synchronization to resolve timezone/clock drift
+  const serverDate = response.headers.get('Date');
+  if (serverDate) {
+    try {
+      const serverTime = new Date(serverDate).getTime();
+      const clientTime = Date.now();
+      if (!isNaN(serverTime)) {
+        serverClientOffset = clientTime - serverTime;
+      }
+    } catch (e) {
+      console.warn('Failed to parse server Date header:', e);
+    }
+  }
 
   if (!response.ok) {
     if (response.status === 403) {
