@@ -32,8 +32,9 @@ export default function ManualSessionForm({ onSuccess }) {
 
     setLoading(true);
     try {
-      // API expects ISO string format. E.g. "2026-07-20T19:00:00"
-      const session = await sessionApi.createManual(subject, durationSeconds, startedAt);
+      // API expects ISO string format with timezone. E.g. "2026-07-20T19:00:00.000Z"
+      const isoStartedAt = new Date(startedAt).toISOString();
+      const session = await sessionApi.createManual(subject, durationSeconds, isoStartedAt);
       setSubject('');
       setHours('');
       setMinutes('');
