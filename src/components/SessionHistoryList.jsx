@@ -1,8 +1,10 @@
 import React from 'react';
 import { History, Calendar, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTheme } from '../context/ThemeContext';
 
 export default function SessionHistoryList({ sessions }) {
+  const { theme } = useTheme();
   
   const formatDuration = (secs) => {
     if (!secs) return '0s';
@@ -71,8 +73,13 @@ export default function SessionHistoryList({ sessions }) {
                 <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} unit="m" />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px' }}
-                  labelStyle={{ color: '#94a3b8', fontWeight: 'bold' }}
+                  contentStyle={{ 
+                    backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff', 
+                    borderColor: theme === 'dark' ? '#334155' : '#cbd5e1', 
+                    borderRadius: '12px',
+                    color: theme === 'dark' ? '#f1f5f9' : '#0f172a'
+                  }}
+                  labelStyle={{ color: theme === 'dark' ? '#94a3b8' : '#475569', fontWeight: 'bold' }}
                 />
                 <Bar dataKey="Số phút học" fill="url(#colorMinutes)" radius={[4, 4, 0, 0]} />
                 <defs>

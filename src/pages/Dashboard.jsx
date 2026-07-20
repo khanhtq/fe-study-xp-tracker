@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { sessionApi } from '../api';
 import XpBar from '../components/XpBar';
 import StudyTimer from '../components/StudyTimer';
 import ManualSessionForm from '../components/ManualSessionForm';
 import SessionHistoryList from '../components/SessionHistoryList';
-import { LogOut, User, Flame, Sparkles, X } from 'lucide-react';
+import { LogOut, User, Flame, Sparkles, X, Sun, Moon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,6 +21,7 @@ const calculateXpEarned = (durationSeconds) => {
 
 export default function Dashboard() {
   const { user, progress, logout, refreshProgress, activeSession } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [sessions, setSessions] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [sessionToast, setSessionToast] = useState(null);
@@ -146,7 +148,7 @@ export default function Dashboard() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Flame className="w-5 h-5 text-white fill-white/20" />
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-purple-200">
+            <span className="font-extrabold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-text-gradient-start to-text-gradient-end">
               Study XP Tracker
             </span>
           </div>
@@ -156,10 +158,22 @@ export default function Dashboard() {
               <User className="w-4 h-4 text-slate-500" />
               <span className="text-slate-300 font-semibold">{user?.displayName}</span>
             </div>
+
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-500 border border-slate-800 transition-colors flex items-center justify-center cursor-pointer"
+              title={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
+            >
+              {theme === 'light' ? (
+                <Moon className="w-5 h-5 text-indigo-600" />
+              ) : (
+                <Sun className="w-5 h-5 text-amber-400 fill-amber-400/20" />
+              )}
+            </button>
             
             <button
               onClick={logout}
-              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Đăng xuất</span>

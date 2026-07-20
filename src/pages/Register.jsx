@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldAlert, UserPlus, LogIn, Flame } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { ShieldAlert, UserPlus, LogIn, Flame, Sun, Moon } from 'lucide-react';
 
 export default function Register({ onToggleView }) {
   const { register } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -25,6 +27,21 @@ export default function Register({ onToggleView }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden">
+      {/* Theme Toggle Button */}
+      <div className="absolute top-6 right-6 z-20">
+        <button
+          onClick={toggleTheme}
+          className="p-3 rounded-2xl bg-slate-900/50 hover:bg-slate-900 text-slate-400 hover:text-indigo-500 border border-slate-800/80 backdrop-blur-md transition-colors flex items-center justify-center cursor-pointer shadow-lg"
+          title={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
+        >
+          {theme === 'light' ? (
+            <Moon className="w-5 h-5 text-indigo-600" />
+          ) : (
+            <Sun className="w-5 h-5 text-amber-400 fill-amber-400/20" />
+          )}
+        </button>
+      </div>
+
       {/* Decorative gradient glowing balls */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
@@ -34,7 +51,7 @@ export default function Register({ onToggleView }) {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 animate-bounce-slow">
             <Flame className="w-8 h-8 text-white fill-white/20" />
           </div>
-          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-purple-200 tracking-tight">
+          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-text-gradient-start to-text-gradient-end tracking-tight">
             Tạo Tài Khoản
           </h2>
           <p className="text-slate-400 mt-2 text-sm text-center">
