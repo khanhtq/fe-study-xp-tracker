@@ -12,14 +12,21 @@ export default function StudyTimer({ onStopResult }) {
   const [isStopping, setIsStopping] = useState(false);
   const timerRef = useRef(null);
 
+  const [localOffset, setLocalOffset] = useState(0);
+
   // Resume or start timer based on activeSession in AuthContext
   useEffect(() => {
     if (activeSession) {
       setSubject(activeSession.subject || '');
+      
+      const getOffset = () => {
+        return localOffset !== 0 ? localOffset : getServerClientOffset();
+      };
+
       // Calculate elapsed time from server start time adjusted for server-client clock drift
       const calculateElapsed = () => {
         const start = new Date(activeSession.startedAt).getTime();
-        const now = Date.now() - getServerClientOffset();
+        const now = Date.now() - getOffset();
         const diff = Math.max(0, Math.floor((now - start) / 1000));
         setSeconds(diff);
       };
@@ -29,11 +36,12 @@ export default function StudyTimer({ onStopResult }) {
       // Update timer every second
       timerRef.current = setInterval(() => {
         const start = new Date(activeSession.startedAt).getTime();
-        const now = Date.now() - getServerClientOffset();
+        const now = Date.now() - getOffset();
         setSeconds(Math.max(0, Math.floor((now - start) / 1000)));
       }, 1000);
     } else {
       setSeconds(0);
+      setLocalOffset(0);
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -45,13 +53,20 @@ export default function StudyTimer({ onStopResult }) {
         clearInterval(timerRef.current);
       }
     };
-  }, [activeSession]);
+  }, [activeSession, localOffset]);
 
   const handleStart = async (e) => {
     e.preventDefault();
     setIsStarting(true);
     try {
+      const clientStartTime = Date.now();
       const session = await sessionApi.start(subject);
+      
+      // Calculate start offset to avoid latency/clock drift issues when starting in current browser tab
+      const serverStartTime = new Date(session.startedAt).getTime();
+      const offset = clientStartTime - serverStartTime;
+      setLocalOffset(offset);
+      
       setActiveSession(session);
     } catch (err) {
       console.error(err);
