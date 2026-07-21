@@ -16,7 +16,9 @@ let serverClientOffset = 0;
 export const getServerClientOffset = () => serverClientOffset;
 
 export const apiCall = async (endpoint, options = {}) => {
-  const url = `${BASE_URL}${endpoint}`;
+  const cleanBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${cleanBaseUrl}${cleanEndpoint}`;
   const headers = { ...getHeaders(), ...options.headers };
   
   const response = await fetch(url, {
