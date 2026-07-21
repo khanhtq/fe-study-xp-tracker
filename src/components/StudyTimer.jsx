@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { sessionApi, getServerClientOffset } from '../api';
 import { Play, Square, BookOpen, Clock, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function StudyTimer({ onStopResult }) {
+function StudyTimer({ onStopResult }) {
   const { activeSession, setActiveSession, refreshProgress } = useAuth();
   const [subject, setSubject] = useState('');
   const [seconds, setSeconds] = useState(0);
@@ -208,3 +208,5 @@ export default function StudyTimer({ onStopResult }) {
     </div>
   );
 }
+
+export default memo(StudyTimer);

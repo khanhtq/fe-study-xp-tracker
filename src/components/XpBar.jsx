@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Trophy } from 'lucide-react';
 
-export default function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel, totalXp }) {
+function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel, totalXp }) {
   const [displayedLevel, setDisplayedLevel] = useState(currentLevel);
   const [displayedXp, setDisplayedXp] = useState(currentXp);
   const [displayedXpRequired, setDisplayedXpRequired] = useState(xpRequiredForNextLevel);
@@ -112,3 +112,5 @@ export default function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel,
     </div>
   );
 }
+
+export default memo(XpBar);

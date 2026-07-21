@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { History, Calendar, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
+import StudyCalendar from './StudyCalendar';
 
-export default function SessionHistoryList({ sessions }) {
+function SessionHistoryList({ sessions }) {
   const { theme } = useTheme();
   
   const formatDuration = (secs) => {
@@ -94,6 +95,9 @@ export default function SessionHistoryList({ sessions }) {
         </div>
       )}
 
+      {/* GitHub-style Study Calendar */}
+      <StudyCalendar sessions={sessions} />
+
       {/* History List Panel */}
       <div className="w-full glass-panel rounded-3xl p-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
@@ -162,3 +166,5 @@ export default function SessionHistoryList({ sessions }) {
     </div>
   );
 }
+
+export default memo(SessionHistoryList);

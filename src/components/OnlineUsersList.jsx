@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { userApi } from '../api';
 import { Users, BookOpen, Clock, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -54,8 +54,13 @@ function OnlineUserRow({ user }) {
         </div>
 
         <div>
-          <span className="font-semibold text-sm text-slate-200 block">
-            {user.displayName}
+          <span className="font-semibold text-sm text-slate-200 flex items-center gap-1.5">
+            <span>{user.displayName}</span>
+            {user.currentLevel && (
+              <span className="px-1.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-400 font-extrabold text-[10px] border border-indigo-500/20">
+                Lv.{user.currentLevel}
+              </span>
+            )}
           </span>
           {user.isStudying ? (
             <span className="text-[11px] text-indigo-300 font-medium flex items-center gap-1 mt-0.5">
@@ -80,7 +85,7 @@ function OnlineUserRow({ user }) {
   );
 }
 
-export default function OnlineUsersList() {
+function OnlineUsersList() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -149,3 +154,5 @@ export default function OnlineUsersList() {
     </div>
   );
 }
+
+export default memo(OnlineUsersList);

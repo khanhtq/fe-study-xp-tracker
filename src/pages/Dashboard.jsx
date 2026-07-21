@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { sessionApi } from '../api';
@@ -27,7 +27,7 @@ export default function Dashboard() {
   const [sessionToast, setSessionToast] = useState(null);
   const [liveXpProgress, setLiveXpProgress] = useState(null);
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const data = await sessionApi.getHistory();
       setSessions(data);
@@ -36,11 +36,11 @@ export default function Dashboard() {
     } finally {
       setLoadingHistory(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchHistory();
-  }, []);
+  }, [fetchHistory]);
 
   useEffect(() => {
     if (!activeSession) {
@@ -86,7 +86,7 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [activeSession, progress]);
 
-  const handleStopResult = (result) => {
+  const handleStopResult = useCallback((result) => {
     // Show XP earned toast
     setSessionToast({
       subject: result.subject || 'Tự do / Khác',
@@ -101,9 +101,9 @@ export default function Dashboard() {
     setTimeout(() => {
       setSessionToast(null);
     }, 5000);
-  };
+  }, [fetchHistory]);
 
-  const handleManualSuccess = (newSession) => {
+  const handleManualSuccess = useCallback((newSession) => {
     fetchHistory();
     setSessionToast({
       subject: newSession.subject || 'Tự do / Khác',
@@ -118,7 +118,7 @@ export default function Dashboard() {
     // However, if we want to check if they leveled up from manual session, we can compare
     // current level in AuthContext before and after. For simplicity, just refresh progress.
     refreshProgress();
-  };
+  }, [fetchHistory, refreshProgress]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-12 relative overflow-hidden">

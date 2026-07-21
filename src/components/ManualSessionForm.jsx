@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { sessionApi } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Play, Pause, Trash2, Plus, BookOpen, Clock, Loader2, CheckCircle2, Award, X, Timer } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function ManualSessionForm({ onSuccess }) {
+function ManualSessionForm({ onSuccess }) {
   const { user, refreshProgress } = useAuth();
   const [goals, setGoals] = useState([]);
   const [subject, setSubject] = useState('');
@@ -533,3 +533,5 @@ export default function ManualSessionForm({ onSuccess }) {
     </div>
   );
 }
+
+export default memo(ManualSessionForm);

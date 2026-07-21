@@ -66,6 +66,11 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white;
     font-family: 'Outfit', sans-serif;
@@ -103,4 +108,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.6);
 }
+
+/* Enable smooth scrolling on custom scroll containers and momentum scroll on iOS */
+.overflow-y-auto, .overflow-x-auto {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+
+
+
+
 
