@@ -300,13 +300,13 @@ function StudyCalendar({ sessions }) {
         </h3>
         
         {/* Year Selector Tabs */}
-        <div className="flex flex-wrap gap-1.5 bg-slate-950/40 p-1 border border-slate-900 rounded-xl dark:bg-slate-950/40 dark:border-slate-900 light:bg-slate-200/40 light:border-slate-300">
+        <div className="flex flex-wrap gap-1.5 bg-slate-800/40 p-1 border border-slate-700/30 rounded-xl">
           <button
             onClick={() => setSelectedYear('lastYear')}
             className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               selectedYear === 'lastYear'
                 ? 'bg-indigo-500 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-950'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             {t('one_year_past')}
@@ -318,7 +318,7 @@ function StudyCalendar({ sessions }) {
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 selectedYear === year.toString()
                   ? 'bg-indigo-500 text-white shadow-md'
-                  : 'text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-950'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {year}
@@ -331,7 +331,7 @@ function StudyCalendar({ sessions }) {
       <div ref={scrollRef} className="w-full overflow-x-auto pb-4 pt-2 scrollbar-thin select-none">
         <div className="min-w-[700px] flex">
           {/* Day of Week Labels */}
-          <div className="flex flex-col gap-[3px] text-[9px] text-slate-500/80 dark:text-slate-500/80 light:text-slate-400 mr-2 mt-[20px] shrink-0 font-medium">
+          <div className="flex flex-col gap-[3px] text-[9px] text-slate-400 mr-2 mt-[20px] shrink-0 font-medium">
             {weekdayLabels.map((dayLabel, idx) => (
               <div key={idx} className="h-[11px] flex items-center">{dayLabel}</div>
             ))}
@@ -340,7 +340,7 @@ function StudyCalendar({ sessions }) {
           {/* Calendar Area */}
           <div className="flex-1">
             {/* Month Labels */}
-            <div className="grid grid-flow-col auto-cols-max gap-[3px] text-[9px] text-slate-500/80 dark:text-slate-500/80 light:text-slate-400 mb-1 h-4 relative">
+            <div className="grid grid-flow-col auto-cols-max gap-[3px] text-[9px] text-slate-400 mb-1 h-4 relative">
               {weeks.map((_, index) => {
                 const label = monthLabels.find(l => l.index === index);
                 
@@ -383,7 +383,7 @@ function StudyCalendar({ sessions }) {
       </div>
 
       {/* Legend & Help Info */}
-      <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-500 light:text-slate-400 mt-2 border-b border-slate-800/40 dark:border-slate-800/40 light:border-slate-200/40 pb-4">
+      <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2 border-b border-slate-800/40 pb-4">
         <span>{t('hover_tip')}</span>
         <div className="flex items-center gap-1">
           <span>{t('legend_less')}</span>
@@ -400,12 +400,12 @@ function StudyCalendar({ sessions }) {
       <div className="grid grid-cols-3 gap-4 pt-4">
         {/* Total Days */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 dark:bg-slate-900/60 dark:border-slate-800/50 light:bg-slate-100 light:border-slate-200/60 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 flex items-center justify-center shrink-0">
             <Calendar className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">{t('total_active_days')}</span>
-            <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{totalActiveDays} {t('days')}</span>
+            <span className="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">{t('total_active_days')}</span>
+            <span className="text-sm font-bold text-slate-200">{totalActiveDays} {t('days')}</span>
           </div>
         </div>
 
@@ -413,37 +413,37 @@ function StudyCalendar({ sessions }) {
         {selectedYear === 'lastYear' || selectedYear === new Date().getFullYear().toString() ? (
           /* Current Streak */
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 dark:bg-slate-900/60 dark:border-slate-800/50 light:bg-slate-100 light:border-slate-200/60 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 flex items-center justify-center shrink-0">
               <Flame className="w-4 h-4 text-orange-400 fill-orange-400/10 animate-pulse" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">{t('current_streak')}</span>
-              <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{currentStreak} {t('days')}</span>
+              <span className="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">{t('current_streak')}</span>
+              <span className="text-sm font-bold text-slate-200">{currentStreak} {t('days')}</span>
             </div>
           </div>
         ) : (
           /* Total Duration */
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 dark:bg-slate-900/60 dark:border-slate-800/50 light:bg-slate-100 light:border-slate-200/60 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 flex items-center justify-center shrink-0">
               <Flame className="w-4 h-4 text-orange-400 fill-orange-400/10" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">{t('total_duration')}</span>
-              <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{formatTotalDuration(totalDurationSeconds)}</span>
+              <span className="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">{t('total_duration')}</span>
+              <span className="text-sm font-bold text-slate-200">{formatTotalDuration(totalDurationSeconds)}</span>
             </div>
           </div>
         )}
 
         {/* Third Stat Card (Longest Streak) */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 dark:bg-slate-900/60 dark:border-slate-800/50 light:bg-slate-100 light:border-slate-200/60 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-slate-900/60 border border-slate-800/50 flex items-center justify-center shrink-0">
             <Trophy className="w-4 h-4 text-amber-400" />
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">
+            <span className="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">
               {selectedYear === 'lastYear' || selectedYear === new Date().getFullYear().toString() ? t('longest_streak') : t('longest_streak_year')}
             </span>
-            <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{longestStreak} {t('days')}</span>
+            <span className="text-sm font-bold text-slate-200">{longestStreak} {t('days')}</span>
           </div>
         </div>
       </div>
