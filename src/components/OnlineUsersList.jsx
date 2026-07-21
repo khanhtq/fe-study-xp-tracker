@@ -78,9 +78,9 @@ function OnlineUserRow({ user }) {
       </div>
 
       {user.isStudying && elapsed && (
-        <div className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-tight tabular-nums">
+        <div className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-tight">
           <Clock className="w-3 h-3 animate-spin" style={{ animationDuration: '3s' }} />
-          {elapsed}
+          <span className="font-mono-timer">{elapsed}</span>
         </div>
       )}
     </div>

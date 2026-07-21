@@ -78,7 +78,7 @@ function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel, totalXp }) {
 
         {/* Numeric Progress */}
         <div className="text-left md:text-right shrink-0">
-          <div className="text-2xl font-black text-indigo-200 leading-none">
+          <div className="font-mono-timer text-2xl font-black text-indigo-200 leading-none">
             {displayedXp.toLocaleString()} <span className="text-slate-500 text-sm font-medium">/ {displayedXpRequired.toLocaleString()} XP</span>
           </div>
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
