@@ -47,18 +47,34 @@ export default function Dashboard() {
       return;
     }
 
+    const getXpRequiredForNextLevel = (level) => {
+      return Math.round(100 * Math.pow(level, 1.5));
+    };
+
     const updateLiveXp = () => {
       const start = new Date(activeSession.startedAt);
       const now = new Date();
       const elapsedSeconds = Math.max(0, Math.floor((now - start) / 1000));
       const xpEarned = calculateXpEarned(elapsedSeconds);
-      const currentXp = (progress?.currentXp ?? 0) + xpEarned;
-      const currentLevel = progress?.currentLevel ?? 1;
-      const xpRequiredForNextLevel = progress?.xpRequiredForNextLevel ?? 100;
+      
+      let tempXp = (progress?.currentXp ?? 0) + xpEarned;
+      let tempLevel = progress?.currentLevel ?? 1;
+      
+      while (true) {
+        const xpRequired = getXpRequiredForNextLevel(tempLevel);
+        if (tempXp >= xpRequired) {
+          tempXp -= xpRequired;
+          tempLevel++;
+        } else {
+          break;
+        }
+      }
+
+      const xpRequiredForNextLevel = getXpRequiredForNextLevel(tempLevel);
 
       setLiveXpProgress({
-        currentLevel,
-        currentXp,
+        currentLevel: tempLevel,
+        currentXp: tempXp,
         xpRequiredForNextLevel,
         totalXp: (progress?.totalXp ?? 0) + xpEarned,
       });
