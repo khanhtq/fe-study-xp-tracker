@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, Flame, Trophy } from 'lucide-react';
 
@@ -10,6 +10,23 @@ function StudyCalendar({ sessions }) {
     content: null,
   });
   const [selectedYear, setSelectedYear] = useState('lastYear');
+  
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const scrollToRight = () => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+      }
+    };
+
+    // Scroll immediately
+    scrollToRight();
+
+    // Scroll after a small timeout to guarantee layout calculations are complete
+    const timeoutId = setTimeout(scrollToRight, 50);
+    return () => clearTimeout(timeoutId);
+  }, [selectedYear, sessions]);
 
   const today = new Date();
   const todayStr = today.toLocaleDateString('en-CA');
@@ -302,7 +319,7 @@ function StudyCalendar({ sessions }) {
       </div>
 
       {/* Grid container with responsive horizontal scrolling */}
-      <div className="w-full overflow-x-auto pb-4 pt-2 scrollbar-thin select-none">
+      <div ref={scrollRef} className="w-full overflow-x-auto pb-4 pt-2 scrollbar-thin select-none">
         <div className="min-w-[700px] flex">
           {/* Day of Week Labels */}
           <div className="flex flex-col gap-[3px] text-[9px] text-slate-500/80 dark:text-slate-500/80 light:text-slate-400 mr-2 mt-[20px] shrink-0 font-medium">
