@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { createPortal } from 'react-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { Calendar, Flame, Trophy } from 'lucide-react';
 
 function StudyCalendar({ sessions }) {
+  const { language, t } = useLanguage();
   const [tooltip, setTooltip] = useState({
     visible: false,
     x: 0,
@@ -168,7 +170,7 @@ function StudyCalendar({ sessions }) {
 
   const formatTotalDuration = (totalSecs) => {
     const hours = Math.round(totalSecs / 3600);
-    return `${hours} giờ`;
+    return `${hours} ${t('hours')}`;
   };
 
   const getMonthLabels = () => {
@@ -190,12 +192,15 @@ function StudyCalendar({ sessions }) {
       startIndex = 1;
     }
 
+    const localeMap = { vi: 'vi-VN', en: 'en-US', zh: 'zh-CN' };
+    const locale = localeMap[language] || 'vi-VN';
+
     for (let i = startIndex; i < candidates.length; i++) {
       const cand = candidates[i];
       if (lastRenderedIndex === -1 || cand.index - lastRenderedIndex >= 3) {
         labels.push({
           index: cand.index,
-          text: cand.date.toLocaleString('vi-VN', { month: 'short' }),
+          text: cand.date.toLocaleString(locale, { month: 'short' }),
         });
         lastRenderedIndex = cand.index;
       }
@@ -243,26 +248,28 @@ function StudyCalendar({ sessions }) {
     const rect = e.currentTarget.getBoundingClientRect();
     
     const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
-    const dateStr = day.toLocaleDateString('vi-VN', options);
+    const localeMap = { vi: 'vi-VN', en: 'en-US', zh: 'zh-CN' };
+    const locale = localeMap[language] || 'vi-VN';
+    const dateStr = day.toLocaleDateString(locale, options);
     
     let content;
     if (!data || data.durationSeconds === 0) {
       content = (
         <div className="space-y-1">
           <div className="font-bold text-slate-300">{dateStr}</div>
-          <div className="text-slate-500">Chưa ghi nhận thời gian học</div>
+          <div className="text-slate-500">{t('no_study_time')}</div>
         </div>
       );
     } else {
       const mins = Math.round(data.durationSeconds / 60);
       const hours = Math.floor(mins / 60);
       const remainingMins = mins % 60;
-      const durationStr = hours > 0 ? `${hours}h ${remainingMins}m` : `${mins} phút`;
+      const durationStr = hours > 0 ? `${hours}h ${remainingMins}m` : `${mins} ${t('minutes')}`;
       
       content = (
         <div className="space-y-1">
           <div className="font-bold text-slate-300">{dateStr}</div>
-          <div className="text-indigo-300 font-semibold">Thời gian: {durationStr}</div>
+          <div className="text-indigo-300 font-semibold">{t('duration')}: {durationStr}</div>
           <div className="text-emerald-400 font-bold">+{data.xpEarned} XP</div>
         </div>
       );
@@ -280,6 +287,8 @@ function StudyCalendar({ sessions }) {
     setTooltip(prev => ({ ...prev, visible: false }));
   };
 
+  const weekdayLabels = t('weekdays') || ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+
   return (
     <div className="w-full glass-panel rounded-3xl p-6 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
@@ -287,7 +296,7 @@ function StudyCalendar({ sessions }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
           <Calendar className="w-5 h-5 text-indigo-400" />
-          Lịch Học Tập
+          {t('calendar_title')}
         </h3>
         
         {/* Year Selector Tabs */}
@@ -300,7 +309,7 @@ function StudyCalendar({ sessions }) {
                 : 'text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-950'
             }`}
           >
-            Một năm qua
+            {t('one_year_past')}
           </button>
           {availableYears.map(year => (
             <button
@@ -323,13 +332,9 @@ function StudyCalendar({ sessions }) {
         <div className="min-w-[700px] flex">
           {/* Day of Week Labels */}
           <div className="flex flex-col gap-[3px] text-[9px] text-slate-500/80 dark:text-slate-500/80 light:text-slate-400 mr-2 mt-[20px] shrink-0 font-medium">
-            <div className="h-[11px] flex items-center">CN</div>
-            <div className="h-[11px] flex items-center">T2</div>
-            <div className="h-[11px] flex items-center">T3</div>
-            <div className="h-[11px] flex items-center">T4</div>
-            <div className="h-[11px] flex items-center">T5</div>
-            <div className="h-[11px] flex items-center">T6</div>
-            <div className="h-[11px] flex items-center">T7</div>
+            {weekdayLabels.map((dayLabel, idx) => (
+              <div key={idx} className="h-[11px] flex items-center">{dayLabel}</div>
+            ))}
           </div>
 
           {/* Calendar Area */}
@@ -379,15 +384,15 @@ function StudyCalendar({ sessions }) {
 
       {/* Legend & Help Info */}
       <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-500 light:text-slate-400 mt-2 border-b border-slate-800/40 dark:border-slate-800/40 light:border-slate-200/40 pb-4">
-        <span>Di chuột lên các ô để xem chi tiết buổi học</span>
+        <span>{t('hover_tip')}</span>
         <div className="flex items-center gap-1">
-          <span>Ít</span>
+          <span>{t('legend_less')}</span>
           <div className="w-[11px] h-[11px] rounded-[2px] bg-[#ebedf0] border border-[#e1e4e8] dark:bg-[#161b22] dark:border-[#1b212a]" />
           <div className="w-[11px] h-[11px] rounded-[2px] bg-[#9be9a8] border border-[#8cd998] dark:bg-[#0e4429] dark:border-[#0c3d25]" />
           <div className="w-[11px] h-[11px] rounded-[2px] bg-[#40c463] border border-[#3ab35a] dark:bg-[#006d32] dark:border-[#00622d]" />
           <div className="w-[11px] h-[11px] rounded-[2px] bg-[#30a14e] border border-[#2b9146] dark:bg-[#26a641] dark:border-[#22953a]" />
           <div className="w-[11px] h-[11px] rounded-[2px] bg-[#216e39] border border-[#1d6333] dark:bg-[#39d353] dark:border-[#33be4b]" />
-          <span>Nhiều</span>
+          <span>{t('legend_more')}</span>
         </div>
       </div>
 
@@ -399,8 +404,8 @@ function StudyCalendar({ sessions }) {
             <Calendar className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">Tổng ngày học</span>
-            <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{totalActiveDays} ngày</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">{t('total_active_days')}</span>
+            <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{totalActiveDays} {t('days')}</span>
           </div>
         </div>
 
@@ -412,8 +417,8 @@ function StudyCalendar({ sessions }) {
               <Flame className="w-4 h-4 text-orange-400 fill-orange-400/10 animate-pulse" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">Chuỗi hiện tại</span>
-              <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{currentStreak} ngày</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">{t('current_streak')}</span>
+              <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{currentStreak} {t('days')}</span>
             </div>
           </div>
         ) : (
@@ -423,7 +428,7 @@ function StudyCalendar({ sessions }) {
               <Flame className="w-4 h-4 text-orange-400 fill-orange-400/10" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">Tổng thời gian</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">{t('total_duration')}</span>
               <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{formatTotalDuration(totalDurationSeconds)}</span>
             </div>
           </div>
@@ -436,9 +441,9 @@ function StudyCalendar({ sessions }) {
           </div>
           <div>
             <span className="text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400 block font-semibold uppercase tracking-wider">
-              {selectedYear === 'lastYear' || selectedYear === new Date().getFullYear().toString() ? 'Chuỗi dài nhất' : 'Chuỗi dài nhất năm'}
+              {selectedYear === 'lastYear' || selectedYear === new Date().getFullYear().toString() ? t('longest_streak') : t('longest_streak_year')}
             </span>
-            <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{longestStreak} ngày</span>
+            <span className="text-sm font-bold text-slate-200 dark:text-slate-200 light:text-slate-800">{longestStreak} {t('days')}</span>
           </div>
         </div>
       </div>

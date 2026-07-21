@@ -1,11 +1,13 @@
 import React, { useState, useEffect, memo } from 'react';
 import { sessionApi } from '../api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Play, Pause, Trash2, Plus, BookOpen, Clock, Loader2, CheckCircle2, Award, X, Timer } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function ManualSessionForm({ onSuccess }) {
   const { user, refreshProgress } = useAuth();
+  const { t } = useLanguage();
   const [goals, setGoals] = useState([]);
   const [subject, setSubject] = useState('');
   const [hours, setHours] = useState('');
@@ -22,9 +24,9 @@ function ManualSessionForm({ onSuccess }) {
     const s = totalSeconds % 60;
     
     const parts = [];
-    if (h > 0) parts.push(`${h} giờ`);
-    if (m > 0) parts.push(`${m} phút`);
-    if (s > 0 || parts.length === 0) parts.push(`${s} giây`);
+    if (h > 0) parts.push(`${h} ${t('hour')}`);
+    if (m > 0) parts.push(`${m} ${t('minute')}`);
+    if (s > 0 || parts.length === 0) parts.push(`${s} ${t('second')}`);
     return parts.join(' ');
   };
 
@@ -160,7 +162,7 @@ function ManualSessionForm({ onSuccess }) {
           await refreshProgress();
         } catch (err) {
           console.error('Lỗi khi ghi nhận buổi học:', err);
-          alert('Không thể tự động ghi nhận buổi học: ' + err.message);
+          alert(t('goal_log_error') + ': ' + err.message);
         } finally {
           setSyncingGoalId(null);
         }
@@ -186,13 +188,13 @@ function ManualSessionForm({ onSuccess }) {
     const durationSeconds = (h * 3600) + (m * 60) + s;
 
     if (durationSeconds <= 0) {
-      setError('Thời lượng mục tiêu phải lớn hơn 0 giây.');
+      setError(t('goal_duration_error'));
       return;
     }
 
     const newGoal = {
       id: `goal_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      subject: subject.trim() || 'Chủ đề học tập',
+      subject: subject.trim() || t('timer_placeholder'),
       durationSeconds,
       remainingSeconds: durationSeconds,
       status: 'idle',
@@ -262,7 +264,7 @@ function ManualSessionForm({ onSuccess }) {
 
         <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 mb-6">
           <Timer className="w-5 h-5 text-indigo-400" />
-          Đặt Mục Tiêu Đếm Ngược
+          {t('goal_countdown_title')}
         </h3>
 
         {error && (
@@ -275,13 +277,13 @@ function ManualSessionForm({ onSuccess }) {
           {/* Subject */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Môn học / Chủ đề
+              {t('subject')}
             </label>
             <div className="relative">
               <BookOpen className="absolute left-4 top-3.5 w-4 h-4 text-slate-500" />
               <input
                 type="text"
-                placeholder="Toán, Lý, Lập trình..."
+                placeholder={t('goal_subject_placeholder')}
                 className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -293,43 +295,43 @@ function ManualSessionForm({ onSuccess }) {
           {/* Time Picker Form */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Thời gian học mục tiêu
+              {t('goal_duration_label')}
             </label>
             <div className="grid grid-cols-3 gap-2">
               <div className="relative">
                 <input
                   type="number"
                   min="0"
-                  placeholder="Giờ"
+                  placeholder={t('hour')}
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-3 py-3 text-center text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
                 />
-                <span className="absolute bottom-1 right-2 text-[9px] font-bold text-slate-500 uppercase">H</span>
+                <span className="absolute bottom-1 right-2 text-[9px] font-bold text-slate-500 uppercase">{t('hour').charAt(0).toUpperCase()}</span>
               </div>
               <div className="relative">
                 <input
                   type="number"
                   min="0"
                   max="59"
-                  placeholder="Phút"
+                  placeholder={t('minute')}
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-3 py-3 text-center text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
                   value={minutes}
                   onChange={(e) => setMinutes(e.target.value)}
                 />
-                <span className="absolute bottom-1 right-2 text-[9px] font-bold text-slate-500 uppercase">M</span>
+                <span className="absolute bottom-1 right-2 text-[9px] font-bold text-slate-500 uppercase">{t('minute').charAt(0).toUpperCase()}</span>
               </div>
               <div className="relative">
                 <input
                   type="number"
                   min="0"
                   max="59"
-                  placeholder="Giây"
+                  placeholder={t('second')}
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-3 py-3 text-center text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
                   value={seconds}
                   onChange={(e) => setSeconds(e.target.value)}
                 />
-                <span className="absolute bottom-1 right-2 text-[9px] font-bold text-slate-500 uppercase">S</span>
+                <span className="absolute bottom-1 right-2 text-[9px] font-bold text-slate-500 uppercase">{t('second').charAt(0).toUpperCase()}</span>
               </div>
             </div>
           </div>
@@ -339,7 +341,7 @@ function ManualSessionForm({ onSuccess }) {
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-2xl transition-all border border-indigo-500/20 flex items-center justify-center gap-2"
           >
             <Plus className="w-5 h-5 text-white" />
-            <span>Thêm mục tiêu mới</span>
+            <span>{t('goal_btn_add')}</span>
           </button>
         </form>
       </div>
@@ -350,7 +352,7 @@ function ManualSessionForm({ onSuccess }) {
 
         <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 mb-6">
           <Clock className="w-5 h-5 text-purple-400" />
-          Mục Tiêu Đã Đặt Ra
+          {t('goal_list_title')}
         </h3>
 
         <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
@@ -362,7 +364,7 @@ function ManualSessionForm({ onSuccess }) {
                 className="text-center py-8 text-slate-500 text-sm flex flex-col items-center gap-2"
               >
                 <Timer className="w-8 h-8 opacity-20" />
-                Chưa có mục tiêu học tập nào được đặt.
+                {t('goal_no_goals')}
               </motion.div>
             ) : (
               goals.map((goal) => {
@@ -396,22 +398,22 @@ function ManualSessionForm({ onSuccess }) {
                           </span>
                           {isCompleted && (
                             <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold border border-emerald-500/20">
-                              Đã hoàn thành
+                              {t('goal_status_completed')}
                             </span>
                           )}
                           {isRunning && (
                             <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full font-bold border border-indigo-500/20 animate-pulse">
-                              Đang chạy
+                              {t('goal_status_running')}
                             </span>
                           )}
                           {goal.status === 'paused' && (
                             <span className="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-bold border border-amber-500/20">
-                              Tạm dừng
+                              {t('goal_status_paused')}
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
-                          <span>Đặt ra: {formatDurationText(goal.durationSeconds)}</span>
+                          <span>{t('goal_set_label')} {formatDurationText(goal.durationSeconds)}</span>
                         </div>
                       </div>
 
@@ -434,7 +436,7 @@ function ManualSessionForm({ onSuccess }) {
                                 <button
                                   onClick={() => handlePauseGoal(goal.id)}
                                   className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:scale-105 text-amber-400 transition-all cursor-pointer"
-                                  title="Tạm dừng"
+                                  title={t('goal_status_paused')}
                                 >
                                   <Pause className="w-4 h-4 fill-amber-400" />
                                 </button>
@@ -442,7 +444,7 @@ function ManualSessionForm({ onSuccess }) {
                                 <button
                                   onClick={() => handleStartGoal(goal.id)}
                                   className="p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:scale-105 text-emerald-400 transition-all cursor-pointer"
-                                  title="Bắt đầu"
+                                  title={t('goal_btn_start')}
                                 >
                                   <Play className="w-4 h-4 fill-emerald-400" />
                                 </button>
@@ -455,7 +457,7 @@ function ManualSessionForm({ onSuccess }) {
                           <button
                             onClick={() => handleDeleteGoal(goal.id)}
                             className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 hover:scale-105 text-rose-400 transition-all cursor-pointer"
-                            title="Xóa mục tiêu"
+                            title={t('goal_btn_delete')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -507,11 +509,12 @@ function ManualSessionForm({ onSuccess }) {
               </div>
 
               <h4 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-indigo-200 mb-2">
-                Hoàn Thành Mục Tiêu! 🎉
+                {t('goal_completed_title')}
               </h4>
               <p className="text-slate-300 text-sm mb-6 px-4">
-                Chúc mừng bạn đã hoàn thành xuất sắc mục tiêu học tập môn{' '}
-                <strong className="text-emerald-300">{completedGoal.subject}</strong> trong{' '}
+                {t('goal_completed_desc')}{' '}
+                <strong className="text-emerald-300">{completedGoal.subject}</strong>{' '}
+                {t('goal_completed_in')}{' '}
                 <strong>{formatDurationText(completedGoal.durationSeconds)}</strong>.
               </p>
 
@@ -524,7 +527,7 @@ function ManualSessionForm({ onSuccess }) {
                 onClick={() => setCompletedGoal(null)}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl transition-all border border-emerald-500/20 shadow-lg shadow-emerald-500/20 cursor-pointer"
               >
-                Tuyệt vời!
+                {t('goal_btn_ok')}
               </button>
             </motion.div>
           </div>

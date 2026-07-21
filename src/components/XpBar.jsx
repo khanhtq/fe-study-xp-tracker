@@ -1,8 +1,10 @@
 import React, { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Trophy } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel, totalXp }) {
+  const { t } = useLanguage();
   const [displayedLevel, setDisplayedLevel] = useState(currentLevel);
   const [displayedXp, setDisplayedXp] = useState(currentXp);
   const [displayedXpRequired, setDisplayedXpRequired] = useState(xpRequiredForNextLevel);
@@ -59,17 +61,17 @@ function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel, totalXp }) {
             <div className="absolute inset-0 bg-indigo-500/30 rounded-full animate-ping opacity-40 scale-110" />
             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-indigo-600 to-purple-600 flex flex-col items-center justify-center border-2 border-indigo-400 shadow-lg shadow-indigo-500/30 relative">
               <span className="text-2xl font-extrabold text-white tracking-tight leading-none">{displayedLevel}</span>
-              <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest leading-none mt-0.5">LVL</span>
+              <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest leading-none mt-0.5">{t('level')}</span>
             </div>
           </div>
 
           <div>
             <h3 className="text-xl font-bold text-slate-100 flex items-center gap-1.5">
-              Tiến Trình Học Tập <Sparkles className="w-4 h-4 text-indigo-400" />
+              {t('study_progress')} <Sparkles className="w-4 h-4 text-indigo-400" />
             </h3>
             <p className="text-sm text-slate-400 flex items-center gap-1">
               <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-              Tổng điểm tích lũy: <span className="font-semibold text-slate-200">{totalXp.toLocaleString()} XP</span>
+              {t('total_xp')}: <span className="font-semibold text-slate-200">{totalXp.toLocaleString()} XP</span>
             </p>
           </div>
         </div>
@@ -80,7 +82,7 @@ function XpBar({ currentLevel, currentXp, xpRequiredForNextLevel, totalXp }) {
             {displayedXp.toLocaleString()} <span className="text-slate-500 text-sm font-medium">/ {displayedXpRequired.toLocaleString()} XP</span>
           </div>
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            {widthPercent.toFixed(1)}% Hoàn thành Level {displayedLevel}
+            {t('level')} {displayedLevel} ({widthPercent.toFixed(1)}%)
           </span>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, memo } from 'react';
 import { userApi } from '../api';
+import { useLanguage } from '../context/LanguageContext';
 import { Users, BookOpen, Clock, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function OnlineUserRow({ user }) {
+  const { t } = useLanguage();
   const [elapsed, setElapsed] = useState('');
 
   useEffect(() => {
@@ -58,18 +60,18 @@ function OnlineUserRow({ user }) {
             <span>{user.displayName}</span>
             {user.currentLevel && (
               <span className="px-1.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-400 font-extrabold text-[10px] border border-indigo-500/20">
-                Lv.{user.currentLevel}
+                {t('level_short')} {user.currentLevel}
               </span>
             )}
           </span>
           {user.isStudying ? (
             <span className="text-[11px] text-indigo-300 font-medium flex items-center gap-1 mt-0.5">
               <BookOpen className="w-3 h-3 text-indigo-400" />
-              Đang học: {user.currentSubject || 'Tự do / Khác'}
+              {t('studying_subject')}: {user.currentSubject || t('timer_placeholder')}
             </span>
           ) : (
             <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
-              Đang hoạt động (Rảnh)
+              {t('status_active_idle')}
             </span>
           )}
         </div>
@@ -86,6 +88,7 @@ function OnlineUserRow({ user }) {
 }
 
 function OnlineUsersList() {
+  const { t } = useLanguage();
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -119,10 +122,10 @@ function OnlineUsersList() {
       <h3 className="text-xl font-bold text-slate-100 flex items-center justify-between mb-4">
         <span className="flex items-center gap-2">
           <Users className="w-5 h-5 text-emerald-400" />
-          Bạn Bè Học Tập
+          {t('online_title')}
         </span>
         <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-900 border border-slate-800 rounded-full text-slate-400">
-          {onlineUsers.length} Online
+          {onlineUsers.length} {t('online_users')}
         </span>
       </h3>
 
@@ -132,7 +135,7 @@ function OnlineUsersList() {
         </div>
       ) : onlineUsers.length === 0 ? (
         <div className="text-center py-8 text-slate-500 text-sm">
-          Không có ai online
+          {t('no_online_short')}
         </div>
       ) : (
         <div className="space-y-3 max-h-72 overflow-y-auto pr-1 scrollbar-thin">

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { sessionApi, getServerClientOffset } from '../api';
 import { Play, Square, BookOpen, Clock, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function StudyTimer({ onStopResult }) {
   const { activeSession, setActiveSession, refreshProgress } = useAuth();
+  const { t } = useLanguage();
   const [subject, setSubject] = useState('');
   const [seconds, setSeconds] = useState(0);
   const [isStarting, setIsStarting] = useState(false);
@@ -70,7 +72,7 @@ function StudyTimer({ onStopResult }) {
       setActiveSession(session);
     } catch (err) {
       console.error(err);
-      alert(err.message || 'Không thể bắt đầu học tập.');
+      alert(err.message || t('timer_start_error'));
     } finally {
       setIsStarting(false);
     }
@@ -89,7 +91,7 @@ function StudyTimer({ onStopResult }) {
       }
     } catch (err) {
       console.error(err);
-      alert(err.message || 'Không thể dừng học tập.');
+      alert(err.message || t('timer_stop_error'));
     } finally {
       setIsStopping(false);
     }
@@ -112,12 +114,12 @@ function StudyTimer({ onStopResult }) {
 
       <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 mb-6 self-start">
         <Clock className="w-5 h-5 text-purple-400" />
-        Đồng Hồ Học Tập
+        {t('timer_title')}
       </h3>
 
       <div className="w-full max-w-sm flex flex-col items-center">
         {/* Animated ticking display */}
-        <div className="relative w-64 h-64 rounded-full border-4 border-slate-800/80 bg-slate-950 flex flex-col items-center justify-center mb-8 shadow-inner relative">
+        <div className="relative w-64 h-64 rounded-full border-4 border-slate-800/80 bg-slate-950 flex flex-col items-center justify-center mb-8 shadow-inner">
           {/* Glowing pulse rings when active */}
           {activeSession && (
             <motion.div
@@ -131,7 +133,7 @@ function StudyTimer({ onStopResult }) {
             {formatTime(seconds)}
           </span>
           <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mt-2">
-            {activeSession ? 'Đang đếm giờ...' : 'Sẵn sàng'}
+            {activeSession ? t('timer_counting') : t('timer_ready')}
           </span>
         </div>
 
@@ -150,7 +152,7 @@ function StudyTimer({ onStopResult }) {
                 <BookOpen className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="Môn học / Chủ đề (ví dụ: Toán Cao Cấp, Java...)"
+                  placeholder={t('timer_input_placeholder')}
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl pl-12 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
@@ -167,7 +169,7 @@ function StudyTimer({ onStopResult }) {
                 ) : (
                   <>
                     <Play className="w-5 h-5 text-white fill-white" />
-                    <span>Bắt đầu học ngay</span>
+                    <span>{t('timer_btn_start')}</span>
                   </>
                 )}
               </button>
@@ -181,9 +183,9 @@ function StudyTimer({ onStopResult }) {
               className="w-full text-center space-y-4"
             >
               <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 inline-block w-full">
-                <span className="text-xs text-slate-500 uppercase tracking-widest block mb-1">Đang học môn</span>
+                <span className="text-xs text-slate-500 uppercase tracking-widest block mb-1">{t('timer_active_desc')}</span>
                 <span className="text-lg font-bold text-indigo-300">
-                  {activeSession.subject || 'Tự do / Khác'}
+                  {activeSession.subject || t('timer_placeholder')}
                 </span>
               </div>
 
@@ -197,7 +199,7 @@ function StudyTimer({ onStopResult }) {
                 ) : (
                   <>
                     <Square className="w-4 h-4 text-white fill-white" />
-                    <span>Kết thúc học & Lưu XP</span>
+                    <span>{t('btn_stop')}</span>
                   </>
                 )}
               </button>

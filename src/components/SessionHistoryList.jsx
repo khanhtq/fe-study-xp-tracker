@@ -2,10 +2,12 @@ import React, { memo } from 'react';
 import { History, Calendar, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import StudyCalendar from './StudyCalendar';
 
 function SessionHistoryList({ sessions }) {
   const { theme } = useTheme();
+  const { language, t } = useLanguage();
   
   const formatDuration = (secs) => {
     if (!secs) return '0s';
@@ -24,7 +26,9 @@ function SessionHistoryList({ sessions }) {
   const formatDate = (dateStr) => {
     try {
       const date = new Date(dateStr);
-      return date.toLocaleString('vi-VN', {
+      const localeMap = { vi: 'vi-VN', en: 'en-US', zh: 'zh-CN' };
+      const locale = localeMap[language] || 'vi-VN';
+      return date.toLocaleString(locale, {
         month: 'numeric',
         day: 'numeric',
         hour: '2-digit',
@@ -43,7 +47,9 @@ function SessionHistoryList({ sessions }) {
     [...sessions].reverse().forEach(session => {
       if (!session.endedAt) return;
       const date = new Date(session.startedAt);
-      const dayKey = date.toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' });
+      const localeMap = { vi: 'vi-VN', en: 'en-US', zh: 'zh-CN' };
+      const locale = localeMap[language] || 'vi-VN';
+      const dayKey = date.toLocaleDateString(locale, { month: 'numeric', day: 'numeric' });
       
       const durationMins = Math.round(session.durationSeconds / 60);
       dailyData[dayKey] = (dailyData[dayKey] || 0) + durationMins;
@@ -51,7 +57,7 @@ function SessionHistoryList({ sessions }) {
 
     return Object.entries(dailyData).map(([date, mins]) => ({
       date,
-      'Số phút học': mins,
+      [t('chart_minutes_label')]: mins,
     })).slice(-7); // Last 7 active days
   };
 
@@ -65,7 +71,7 @@ function SessionHistoryList({ sessions }) {
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
           <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 mb-4">
             <TrendingUp className="w-5 h-5 text-indigo-400" />
-            Thống Kê 7 Ngày Gần Nhất
+            {t('chart_title')}
           </h3>
           
           <div className="w-full h-48 mt-2">
@@ -74,7 +80,7 @@ function SessionHistoryList({ sessions }) {
                 <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} unit="m" />
                 <Tooltip 
-                  contentStyle={{ 
+                   contentStyle={{ 
                     backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff', 
                     borderColor: theme === 'dark' ? '#334155' : '#cbd5e1', 
                     borderRadius: '12px',
@@ -82,7 +88,7 @@ function SessionHistoryList({ sessions }) {
                   }}
                   labelStyle={{ color: theme === 'dark' ? '#94a3b8' : '#475569', fontWeight: 'bold' }}
                 />
-                <Bar dataKey="Số phút học" fill="url(#colorMinutes)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey={t('chart_minutes_label')} fill="url(#colorMinutes)" radius={[4, 4, 0, 0]} />
                 <defs>
                   <linearGradient id="colorMinutes" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
@@ -104,7 +110,7 @@ function SessionHistoryList({ sessions }) {
         
         <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 mb-6">
           <History className="w-5 h-5 text-purple-400" />
-          Lịch Sử Học Tập
+          {t('history_title')}
         </h3>
 
         {sessions.length === 0 ? (
@@ -112,8 +118,8 @@ function SessionHistoryList({ sessions }) {
             <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
               <Calendar className="w-6 h-6 text-slate-600" />
             </div>
-            <p className="text-slate-500 font-medium">Chưa ghi nhận buổi học nào.</p>
-            <p className="text-xs text-slate-600 mt-1">Hãy khởi động timer hoặc nhập thủ công để bắt đầu cày XP!</p>
+            <p className="text-slate-500 font-medium">{t('no_sessions')}</p>
+            <p className="text-xs text-slate-600 mt-1">{t('no_sessions_subtitle')}</p>
           </div>
         ) : (
           <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">
@@ -125,14 +131,14 @@ function SessionHistoryList({ sessions }) {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-bold text-slate-200 truncate">
-                      {session.subject || 'Tự do / Khác'}
+                      {session.subject || t('timer_placeholder')}
                     </span>
                     <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                       session.source === 'TIMER' 
                         ? 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20' 
                         : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                     }`}>
-                      {session.source === 'TIMER' ? 'Đồng hồ' : 'Thủ công'}
+                      {session.source === 'TIMER' ? t('source_timer') : t('source_manual')}
                     </span>
                   </div>
                   
@@ -154,7 +160,7 @@ function SessionHistoryList({ sessions }) {
                     </span>
                   ) : (
                     <span className="text-xs text-indigo-400 font-semibold animate-pulse">
-                      Đang học...
+                      {t('timer_counting')}
                     </span>
                   )}
                 </div>

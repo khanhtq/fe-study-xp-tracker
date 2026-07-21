@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { sessionApi } from '../api';
 import XpBar from '../components/XpBar';
 import StudyTimer from '../components/StudyTimer';
@@ -22,6 +23,7 @@ const calculateXpEarned = (durationSeconds) => {
 export default function Dashboard() {
   const { user, progress, logout, refreshProgress, activeSession } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [sessions, setSessions] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [sessionToast, setSessionToast] = useState(null);
@@ -144,10 +146,22 @@ export default function Dashboard() {
               <span className="text-slate-300 font-semibold">{user?.displayName}</span>
             </div>
 
+            {/* Language Selector Dropdown */}
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-2xl px-3 py-1.5 text-sm font-semibold outline-none cursor-pointer hover:text-indigo-500 transition-colors"
+              title={t('language')}
+            >
+              <option value="vi" className="bg-slate-950 text-slate-300">Tiếng Việt</option>
+              <option value="en" className="bg-slate-950 text-slate-300">English</option>
+              <option value="zh" className="bg-slate-950 text-slate-300">简体中文</option>
+            </select>
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-500 border border-slate-800 transition-colors flex items-center justify-center cursor-pointer"
-              title={theme === 'light' ? 'Chuyển sang chế độ tối' : 'Chuyển sang chế độ sáng'}
+              title={theme === 'light' ? t('theme_dark') : t('theme_light')}
             >
               {theme === 'light' ? (
                 <Moon className="w-5 h-5 text-indigo-600" />
@@ -161,7 +175,7 @@ export default function Dashboard() {
               className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Đăng xuất</span>
+              <span className="hidden sm:inline">{t('logout')}</span>
             </button>
           </div>
         </div>
@@ -202,8 +216,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-
-
       {/* Session Result Toast */}
       <AnimatePresence>
         {sessionToast && (
@@ -215,9 +227,9 @@ export default function Dashboard() {
           >
             <div className="glass-panel glass-panel-glow border-indigo-500/30 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-xl">
               <div>
-                <span className="text-xs text-indigo-400 font-extrabold uppercase tracking-wider block">Học tập hoàn thành</span>
+                <span className="text-xs text-indigo-400 font-extrabold uppercase tracking-wider block">{t('session_completed')}</span>
                 <span className="font-bold text-slate-200">{sessionToast.subject}</span>
-                <span className="text-xs text-slate-400 ml-2">({Math.round(sessionToast.durationSeconds / 60)} phút)</span>
+                <span className="text-xs text-slate-400 ml-2">({Math.round(sessionToast.durationSeconds / 60)} {t('minutes')})</span>
               </div>
               
               <div className="shrink-0 flex items-center gap-2">
