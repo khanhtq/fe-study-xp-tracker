@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
 function MainApp() {
   const { token, loading } = useAuth();
-  const [showRegister, setShowRegister] = useState(false);
+  const [view, setView] = useState('landing');
   const { t } = useLanguage();
 
   if (loading) {
@@ -23,10 +24,23 @@ function MainApp() {
   }
 
   if (!token) {
-    if (showRegister) {
-      return <Register onToggleView={() => setShowRegister(false)} />;
+    if (view === 'login') {
+      return (
+        <Login 
+          onToggleView={() => setView('register')} 
+          onBackToLanding={() => setView('landing')} 
+        />
+      );
     }
-    return <Login onToggleView={() => setShowRegister(true)} />;
+    if (view === 'register') {
+      return (
+        <Register 
+          onToggleView={() => setView('login')} 
+          onBackToLanding={() => setView('landing')} 
+        />
+      );
+    }
+    return <Landing onNavigate={setView} />;
   }
 
   return <Dashboard />;

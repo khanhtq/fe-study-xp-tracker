@@ -1,0 +1,24 @@
+{
+  "short_name": "Study XP",
+  "name": "Study XP Tracker - Gamify Your Study",
+  "description": "Theo dõi thời gian học tập, tích lũy điểm kinh nghiệm (XP), thăng cấp và duy trì chuỗi học tập hàng ngày.",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#6366f1",
+  "background_color": "#0f172a"
+}

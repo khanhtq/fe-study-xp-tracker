@@ -122,6 +122,30 @@ const translations = {
     legend_less: "Ít",
     legend_more: "Nhiều",
     weekdays: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+
+    // landing page
+    landing_slogan: "Thăng Cấp Hành Trình Học Tập Của Bạn",
+    landing_sub: "Biến mỗi phút học tập thành điểm kinh nghiệm (XP), thăng cấp như trong game RPG và cày cuốc cùng bạn bè trực tuyến trong thời gian thực.",
+    landing_cta_get_started: "Bắt đầu cày cuốc",
+    landing_cta_login: "Đăng nhập",
+    landing_cta_features: "Khám phá tính năng",
+    landing_mock_timer_title: "Chạy thử đồng hồ & Nhận XP",
+    landing_mock_timer_desc: "Nhấn nút dưới để bắt đầu mô phỏng phiên học thực tế.",
+    landing_mock_btn_start: "Bắt đầu học thử",
+    landing_mock_btn_stop: "Dừng & Claim XP!",
+    landing_mock_level_up: "THĂNG CẤP! 🎉",
+    landing_mock_xp_gained: "Bạn đã nhận được",
+    landing_mock_total_xp: "Tổng XP giả lập",
+    landing_feature_title: "Các tính năng nổi bật",
+    landing_feature_timer_title: "Đồng hồ Pomodoro chống gian lận",
+    landing_feature_timer_desc: "Theo dõi thời gian học từng giây. Đảm bảo chống gian lận thông qua tính toán trực tiếp từ máy chủ.",
+    landing_feature_rpg_title: "Cơ chế game nhập vai RPG",
+    landing_feature_rpg_desc: "Công thức thăng cấp thú vị, tặng thêm 10% XP cho các buổi học tập trung chất lượng cao trên 25 phút.",
+    landing_feature_coop_title: "Phòng học trực tuyến cùng bạn bè",
+    landing_feature_coop_desc: "Nhìn thấy danh sách những người học trực tuyến khác cùng với trạng thái và cấp độ của họ để duy trì động lực.",
+    landing_feature_heatmap_title: "Lịch học & Chuỗi ngày (Streaks)",
+    landing_feature_heatmap_desc: "Lịch đóng góp giống Github và thống kê chi tiết giúp bạn theo dõi sát sao tiến độ học tập hàng tuần.",
+    landing_back_to_home: "Trở về Trang chủ",
   },
   en: {
     // auth / login / register
@@ -242,6 +266,30 @@ const translations = {
     legend_less: "Less",
     legend_more: "More",
     weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+
+    // landing page
+    landing_slogan: "Level Up Your Learning Journey",
+    landing_sub: "Convert every minute of studying into Experience Points (XP), level up like an RPG character, and grind together with online study companions.",
+    landing_cta_get_started: "Get Started",
+    landing_cta_login: "Log In",
+    landing_cta_features: "Explore Features",
+    landing_mock_timer_title: "Test Drive the Timer & Claim XP",
+    landing_mock_timer_desc: "Click the button below to simulate a real study session.",
+    landing_mock_btn_start: "Start Free Trial",
+    landing_mock_btn_stop: "Stop & Claim XP!",
+    landing_mock_level_up: "LEVEL UP! 🎉",
+    landing_mock_xp_gained: "You gained",
+    landing_mock_total_xp: "Mock Total XP",
+    landing_feature_title: "Key Features",
+    landing_feature_timer_title: "Anti-Cheat Pomodoro Timer",
+    landing_feature_timer_desc: "Track study time down to the second. Built-in anti-cheat prevents time tampering via server-side verification.",
+    landing_feature_rpg_title: "RPG Leveling Mechanics",
+    landing_feature_rpg_desc: "Exciting level-up formula. Earn +10% bonus XP for high-focus sessions of 25 minutes or more.",
+    landing_feature_coop_title: "Realtime Co-studying Room",
+    landing_feature_coop_desc: "See other online users, their levels, and what they are studying in real-time to keep your fire burning.",
+    landing_feature_heatmap_title: "Study Calendar & Streaks",
+    landing_feature_heatmap_desc: "GitHub-style contribution heatmap and detailed charts to help you monitor your weekly progress.",
+    landing_back_to_home: "Back to Home",
   },
   zh: {
     // auth / login / register
@@ -362,6 +410,30 @@ const translations = {
     legend_less: "少",
     legend_more: "多",
     weekdays: ["日", "一", "二", "三", "四", "五", "六"],
+
+    // landing page
+    landing_slogan: "提升您的学习之旅",
+    landing_sub: "将您学习的每一分钟转化为经验值（XP），像RPG角色一样升级，并与在线学习伙伴一起奋斗。",
+    landing_cta_get_started: "开始挑战",
+    landing_cta_login: "登录",
+    landing_cta_features: "探索功能",
+    landing_mock_timer_title: "试用计时器并领取经验值",
+    landing_mock_timer_desc: "点击下方按钮模拟真实的学习过程。",
+    landing_mock_btn_start: "开始试用",
+    landing_mock_btn_stop: "停止并领取经验值！",
+    landing_mock_level_up: "恭喜升级！🎉",
+    landing_mock_xp_gained: "您获得了",
+    landing_mock_total_xp: "模拟总经验",
+    landing_feature_title: "主要功能",
+    landing_feature_timer_title: "防作弊番茄计时器",
+    landing_feature_timer_desc: "精确记录每一秒的学习时间。通过服务器端验证防止篡改时间，内置防作弊机制。",
+    landing_feature_rpg_title: "RPG 游戏升级机制",
+    landing_feature_rpg_desc: "有趣的升级公式。专注学习25分钟或以上，可额外获得10%的经验值奖励。",
+    landing_feature_coop_title: "实时协同学习",
+    landing_feature_coop_desc: "实时查看其他在线用户、他们的等级以及他们正在学习的内容，保持学习热情。",
+    landing_feature_heatmap_title: "学习日历与连续天数",
+    landing_feature_heatmap_desc: "类 GitHub 贡献热力图和详细的统计图表，帮助您监控每周的学习进度。",
+    landing_back_to_home: "返回主页",
   }
 };
 
@@ -377,6 +449,55 @@ export const LanguageProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('language', language);
+    
+    // SEO Dynamic Update
+    document.documentElement.lang = language;
+    
+    let title = "Study XP Tracker - Hệ thống theo dõi học tập và thăng cấp XP";
+    let description = "Study XP Tracker giúp bạn theo dõi thời gian học tập, tích lũy điểm kinh nghiệm (XP), thăng cấp và duy trì chuỗi học tập hàng ngày. Học tập hiệu quả hơn cùng bạn bè.";
+    
+    if (language === 'en') {
+      title = "Study XP Tracker - Level up your study routine";
+      description = "Study XP Tracker helps you track your study time, accumulate Experience Points (XP), level up, and maintain daily study streaks. Study better with friends.";
+    } else if (language === 'zh') {
+      title = "Study XP Tracker - 追踪学习进度，提升等级";
+      description = "Study XP Tracker 帮助您跟踪学习时间，累积经验值（XP），提升等级，并保持每日学习习惯。与朋友一起更高效地学习。";
+    }
+    
+    document.title = title;
+    
+    // Update meta title tag
+    let metaTitle = document.querySelector('meta[name="title"]');
+    if (metaTitle) metaTitle.setAttribute('content', title);
+    
+    // Update description tag
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.setAttribute('name', 'description');
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute('content', description);
+    
+    // Update Open Graph (og:) tags
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+    
+    let ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', description);
+    
+    let ogLocale = document.querySelector('meta[property="og:locale"]');
+    if (ogLocale) {
+      const locales = { vi: 'vi_VN', en: 'en_US', zh: 'zh_CN' };
+      ogLocale.setAttribute('content', locales[language] || 'vi_VN');
+    }
+    
+    // Update Twitter tags
+    let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) twitterTitle.setAttribute('content', title);
+    
+    let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) twitterDesc.setAttribute('content', description);
   }, [language]);
 
   const t = (key) => {

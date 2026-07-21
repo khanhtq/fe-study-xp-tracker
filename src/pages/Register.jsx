@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ShieldAlert, UserPlus, LogIn, Flame, Sun, Moon } from 'lucide-react';
 
-export default function Register({ onToggleView }) {
+export default function Register({ onToggleView, onBackToLanding }) {
   const { register } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -138,14 +138,24 @@ export default function Register({ onToggleView }) {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-slate-400">
-          {t('already_have_account')}{' '}
-          <button
-            onClick={onToggleView}
-            className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors inline-flex items-center gap-1"
-          >
-            {t('login_now')} <LogIn className="w-4 h-4" />
-          </button>
+        <div className="mt-6 pt-6 border-t border-slate-900/50 flex flex-col gap-3 text-center text-sm text-slate-400">
+          <div>
+            {t('already_have_account')}{' '}
+            <button
+              onClick={onToggleView}
+              className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors inline-flex items-center gap-1 cursor-pointer"
+            >
+              {t('login_now')} <LogIn className="w-4 h-4" />
+            </button>
+          </div>
+          <div>
+            <button
+              onClick={onBackToLanding}
+              className="text-slate-500 hover:text-slate-355 font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
+            >
+              &larr; {t('landing_back_to_home')}
+            </button>
+          </div>
         </div>
       </div>
     </div>
