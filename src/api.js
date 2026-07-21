@@ -23,7 +23,7 @@ export class ApiError extends Error {
 export const getErrorKey = (status, endpoint = '') => {
   // Auth-specific errors
   if (endpoint.includes('/auth/login')) {
-    if (status === 401 || status === 400) return 'error_invalid_credentials';
+    if (status === 401 || status === 400 || status === 403) return 'error_invalid_credentials';
     if (status === 404) return 'error_account_not_found';
     if (status === 429) return 'error_too_many_requests';
   }
