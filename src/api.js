@@ -1,5 +1,52 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
+/**
+ * Custom API error with HTTP status and i18n key for friendly UI messages.
+ */
+export class ApiError extends Error {
+  constructor(message, status, errorKey) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.errorKey = errorKey; // translation key for LanguageContext
+  }
+}
+
+/**
+ * Map an HTTP status code + endpoint context to a translation key.
+ * Falls back to generic keys so every error has a human-readable message.
+ *
+ * @param {number} status - HTTP response status code
+ * @param {string} endpoint - The API endpoint string (e.g. '/auth/login')
+ * @returns {string} - A key present in LanguageContext translations
+ */
+export const getErrorKey = (status, endpoint = '') => {
+  // Auth-specific errors
+  if (endpoint.includes('/auth/login')) {
+    if (status === 401 || status === 400) return 'error_invalid_credentials';
+    if (status === 404) return 'error_account_not_found';
+    if (status === 429) return 'error_too_many_requests';
+  }
+  if (endpoint.includes('/auth/register')) {
+    if (status === 409 || status === 400) return 'error_email_already_exists';
+    if (status === 422) return 'error_invalid_input';
+    if (status === 429) return 'error_too_many_requests';
+  }
+  // Session errors
+  if (endpoint.includes('/study-sessions')) {
+    if (status === 409) return 'error_session_already_active';
+    if (status === 404) return 'error_session_not_found';
+  }
+  // Generic status-based fallbacks
+  if (status === 400) return 'error_bad_request';
+  if (status === 401) return 'error_unauthorized';
+  if (status === 403) return 'error_forbidden';
+  if (status === 404) return 'error_not_found';
+  if (status === 429) return 'error_too_many_requests';
+  if (status >= 500) return 'error_server';
+  return 'error_unknown';
+};
+
 const getHeaders = () => {
   const token = localStorage.getItem('token');
   const headers = {
@@ -48,7 +95,12 @@ export const apiCall = async (endpoint, options = {}) => {
       window.dispatchEvent(new Event('auth-expired'));
     }
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API error: ${response.status}`);
+    const errorKey = getErrorKey(response.status, endpoint);
+    throw new ApiError(
+      errorData.message || `API error: ${response.status}`,
+      response.status,
+      errorKey
+    );
   }
 
   if (response.status === 204) {

@@ -20,7 +20,12 @@ export default function Login({ onToggleView, onBackToLanding }) {
     try {
       await login(email, password);
     } catch (err) {
-      setError(err.message || t('login_failed'));
+      // Use the i18n error key if available (from ApiError), otherwise fall back
+      if (err.errorKey) {
+        setError(t(err.errorKey));
+      } else {
+        setError(err.message || t('login_failed'));
+      }
     } finally {
       setLoading(false);
     }

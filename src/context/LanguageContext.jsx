@@ -25,6 +25,21 @@ const translations = {
     login_failed: "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.",
     loading_account: "Đang tải tài khoản...",
 
+    // friendly error messages (mapped from API error codes)
+    error_invalid_credentials: "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.",
+    error_account_not_found: "Không tìm thấy tài khoản với email này.",
+    error_email_already_exists: "Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.",
+    error_invalid_input: "Thông tin không hợp lệ. Vui lòng kiểm tra lại các trường.",
+    error_session_already_active: "Bạn đang có một phiên học chưa kết thúc.",
+    error_session_not_found: "Không tìm thấy phiên học này.",
+    error_bad_request: "Yêu cầu không hợp lệ. Vui lòng kiểm tra lại thông tin.",
+    error_unauthorized: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    error_forbidden: "Bạn không có quyền thực hiện hành động này.",
+    error_not_found: "Không tìm thấy tài nguyên yêu cầu.",
+    error_too_many_requests: "Bạn đã thử quá nhiều lần. Vui lòng chờ một lúc rồi thử lại.",
+    error_server: "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
+    error_unknown: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+
     // dashboard layout & navbar
     logout: "Đăng xuất",
     theme_light: "Chế độ sáng",
@@ -182,6 +197,21 @@ const translations = {
     login_failed: "Login failed. Please check your credentials.",
     loading_account: "Loading account...",
 
+    // friendly error messages (mapped from API error codes)
+    error_invalid_credentials: "Incorrect email or password. Please try again.",
+    error_account_not_found: "No account found with this email address.",
+    error_email_already_exists: "This email is already in use. Please use a different email or log in.",
+    error_invalid_input: "Invalid input. Please check your details and try again.",
+    error_session_already_active: "You already have an active study session.",
+    error_session_not_found: "Study session not found.",
+    error_bad_request: "Invalid request. Please check your input.",
+    error_unauthorized: "Your session has expired. Please log in again.",
+    error_forbidden: "You do not have permission to perform this action.",
+    error_not_found: "The requested resource was not found.",
+    error_too_many_requests: "Too many attempts. Please wait a moment and try again.",
+    error_server: "The server is experiencing issues. Please try again later.",
+    error_unknown: "An unexpected error occurred. Please try again.",
+
     // dashboard layout & navbar
     logout: "Log Out",
     theme_light: "Light Mode",
@@ -338,6 +368,21 @@ const translations = {
     register_failed: "注册失败。请重试。",
     login_failed: "登录失败。请检查您的凭据。",
     loading_account: "正在加载账户...",
+
+    // friendly error messages (mapped from API error codes)
+    error_invalid_credentials: "电子邮件或密码不正确，请重试。",
+    error_account_not_found: "未找到使用此电子邮件的账户。",
+    error_email_already_exists: "此电子邮件已被使用。请使用其他邮件或直接登录。",
+    error_invalid_input: "输入无效，请检查您的信息后重试。",
+    error_session_already_active: "您已有一个正在进行的学习会话。",
+    error_session_not_found: "未找到该学习会话。",
+    error_bad_request: "请求无效，请检查您的输入。",
+    error_unauthorized: "您的登录会话已过期，请重新登录。",
+    error_forbidden: "您没有权限执行此操作。",
+    error_not_found: "未找到所请求的资源。",
+    error_too_many_requests: "尝试次数过多，请稍等片刻后再试。",
+    error_server: "服务器遇到问题，请稍后重试。",
+    error_unknown: "发生了未知错误，请重试。",
 
     // dashboard layout & navbar
     logout: "退出登录",
