@@ -6,6 +6,7 @@ import XpBar from '../components/XpBar';
 import StudyTimer from '../components/StudyTimer';
 import ManualSessionForm from '../components/ManualSessionForm';
 import SessionHistoryList from '../components/SessionHistoryList';
+import OnlineUsersList from '../components/OnlineUsersList';
 import { LogOut, User, Flame, X, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -185,6 +186,7 @@ export default function Dashboard() {
           <div className="lg:col-span-1 space-y-8">
             <StudyTimer onStopResult={handleStopResult} />
             <ManualSessionForm onSuccess={handleManualSuccess} />
+            <OnlineUsersList />
           </div>
 
           {/* Right Column: Statistics & History */}

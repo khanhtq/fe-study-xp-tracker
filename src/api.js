@@ -71,6 +71,7 @@ export const authApi = {
 
 export const userApi = {
   getMe: () => apiCall('/users/me'),
+  getOnline: () => apiCall('/users/online'),
 };
 
 export const sessionApi = {
