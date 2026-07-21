@@ -268,7 +268,7 @@ function ManualSessionForm({ onSuccess }) {
         </h3>
 
         {error && (
-          <div className="mb-4 text-xs bg-red-500/10 border border-red-500/30 text-red-200 rounded-xl p-3">
+          <div className="mb-4 text-xs bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-200 rounded-xl p-3">
             {error}
           </div>
         )}

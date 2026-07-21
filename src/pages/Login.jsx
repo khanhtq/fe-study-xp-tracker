@@ -77,8 +77,8 @@ export default function Login({ onToggleView, onBackToLanding }) {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-500/10 border border-red-500/30 text-red-200 text-sm rounded-2xl p-4 flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+          <div className="mb-6 bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-200 text-sm rounded-2xl p-4 flex items-start gap-3">
+            <ShieldAlert className="w-5 h-5 text-red-500 dark:text-red-400 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
