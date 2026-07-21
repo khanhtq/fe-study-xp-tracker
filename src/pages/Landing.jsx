@@ -318,7 +318,7 @@ export default function Landing({ onNavigate }) {
                   className="self-center flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Đặt lại giả lập</span>
+                  <span>{language === 'vi' ? 'Đặt lại giả lập' : language === 'zh' ? '重置模拟' : 'Reset Simulator'}</span>
                 </button>
               )}
             </div>
@@ -343,13 +343,13 @@ export default function Landing({ onNavigate }) {
                       {t('landing_mock_level_up')}
                     </h4>
                     <p className="text-sm text-slate-300 mt-2">
-                      Chào mừng bạn thăng lên Cấp <strong className="text-indigo-400 font-bold">{mockLevel}</strong>!
+                      {language === 'vi' ? 'Chào mừng bạn thăng lên Cấp' : language === 'zh' ? '欢迎升级到等级' : 'Welcome to Level'} <strong className="text-indigo-400 font-bold">{mockLevel}</strong>!
                     </p>
                     <button
                       onClick={() => setShowLevelUp(false)}
                       className="mt-5 px-5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white cursor-pointer"
                     >
-                      Tiếp tục học
+                      {language === 'vi' ? 'Tiếp tục học' : language === 'zh' ? '继续学习' : 'Keep Studying'}
                     </button>
                   </motion.div>
                 ) : gainedXpToast ? (
@@ -364,10 +364,10 @@ export default function Landing({ onNavigate }) {
                       +{gainedXpToast}
                     </div>
                     <h4 className="text-xl font-bold text-emerald-400">
-                      Claim XP Thành Công!
+                      {language === 'vi' ? 'Claim XP Thành Công!' : language === 'zh' ? '成功领取经验值！' : 'XP Claimed Successfully!'}
                     </h4>
                     <p className="text-sm text-slate-400 mt-1 max-w-xs">
-                      {t('landing_mock_xp_gained')} <strong>{gainedXpToast} XP</strong> từ phiên học giả lập. Đăng ký tài khoản để bắt đầu lưu điểm thật!
+                      {t('landing_mock_xp_gained')} <strong>{gainedXpToast} XP</strong> {language === 'vi' ? 'từ phiên học giả lập. Đăng ký tài khoản để bắt đầu lưu điểm thật!' : language === 'zh' ? '来自模拟学习。注册账户开始记录真实数据！' : 'from mock session. Sign up to save real progress!'}
                     </p>
                   </motion.div>
                 ) : isTimerRunning ? (
@@ -380,10 +380,10 @@ export default function Landing({ onNavigate }) {
                   >
                     <div className="w-14 h-14 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-2" />
                     <h4 className="text-lg font-bold text-indigo-300">
-                      Hệ thống đang đếm giờ học
+                      {language === 'vi' ? 'Hệ thống đang đếm giờ học' : language === 'zh' ? '系统正在计时' : 'Timer is running'}
                     </h4>
                     <p className="text-sm text-slate-400 max-w-xs">
-                      Mỗi giây trôi qua tăng thêm <strong className="text-indigo-400 font-bold">25 XP</strong>. Hãy tập trung cày cuốc!
+                      {language === 'vi' ? 'Mỗi giây trôi qua tăng thêm' : language === 'zh' ? '每秒获得' : 'Every second adds'} <strong className="text-indigo-400 font-bold">25 XP</strong>. {language === 'vi' ? 'Hãy tập trung cày cuốc!' : language === 'zh' ? '请保持专注！' : 'Keep focusing!'}
                     </p>
                   </motion.div>
                 ) : (
@@ -396,10 +396,10 @@ export default function Landing({ onNavigate }) {
                   >
                     <Flame className="w-16 h-16 text-indigo-500/20 animate-pulse mb-3" />
                     <h4 className="text-lg font-bold text-slate-300">
-                      Hãy trải nghiệm thử!
+                      {language === 'vi' ? 'Hãy trải nghiệm thử!' : language === 'zh' ? '请体验试用！' : 'Try it out!'}
                     </h4>
                     <p className="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed">
-                      Nhấp nút Bắt đầu học thử để trải nghiệm cơ chế theo dõi thời gian và thăng cấp điểm kinh nghiệm trực tuyến.
+                      {language === 'vi' ? 'Nhấp nút Bắt đầu học thử để trải nghiệm cơ chế theo dõi thời gian và thăng cấp điểm kinh nghiệm trực tuyến.' : language === 'zh' ? '点击开始试用按钮体验在线记录时间和升级经验值机制。' : 'Click Start Free Trial to experience real-time time tracking and experience leveling mechanics.'}
                     </p>
                   </motion.div>
                 )}
@@ -480,23 +480,23 @@ export default function Landing({ onNavigate }) {
             className="space-y-6"
           >
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-text-gradient-start to-text-gradient-end">
-              Theo dõi trực quan tiến độ học tập
+              {t('landing_showcase_title')}
             </h2>
             <p className="text-slate-400 leading-relaxed">
-              Website cung cấp hệ thống lịch học (Contribution Map) giống phong cách GitHub, tự động lưu lại tất cả chuỗi ngày liên tiếp bạn học tập (Streaks). Ngoài ra còn tích hợp biểu đồ thống kê 7 ngày gần nhất sử dụng thư viện Recharts để bạn dễ dàng đánh giá sự tập trung của bản thân.
+              {t('landing_showcase_desc')}
             </p>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-slate-300">
                 <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0" />
-                <span>Thống kê chi tiết số phút học mỗi ngày</span>
+                <span>{t('landing_showcase_item1')}</span>
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-300">
                 <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0" />
-                <span>Theo dõi chuỗi ngày học hiện tại và chuỗi dài nhất để kích hoạt động lực cày cuốc</span>
+                <span>{t('landing_showcase_item2')}</span>
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-300">
                 <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0" />
-                <span>Dễ dàng ghi nhận thủ công nếu học ngoại tuyến hoặc quên chạy đồng hồ</span>
+                <span>{t('landing_showcase_item3')}</span>
               </li>
             </ul>
 
@@ -504,7 +504,7 @@ export default function Landing({ onNavigate }) {
               onClick={() => onNavigate('register')}
               className="inline-flex items-center gap-2 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-300 font-bold px-6 py-3 rounded-2xl border border-indigo-500/20 transition-all cursor-pointer"
             >
-              <span>Trải nghiệm ngay</span>
+              <span>{t('landing_showcase_btn')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </motion.div>
@@ -530,24 +530,24 @@ export default function Landing({ onNavigate }) {
               {/* Mockup Top stats */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-900 text-center">
-                  <span className="block text-[10px] text-slate-500 uppercase font-semibold">Chuỗi Ngày</span>
+                  <span className="block text-[10px] text-slate-500 uppercase font-semibold">{t('landing_mock_streak')}</span>
                   <span className="text-lg font-bold text-amber-500 flex items-center justify-center gap-1">
                     12 <Flame className="w-4 h-4 fill-amber-500/20 shrink-0" />
                   </span>
                 </div>
                 <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-900 text-center">
-                  <span className="block text-[10px] text-slate-500 uppercase font-semibold">Cấp Độ</span>
+                  <span className="block text-[10px] text-slate-500 uppercase font-semibold">{t('landing_mock_level')}</span>
                   <span className="text-lg font-bold text-indigo-400">14</span>
                 </div>
                 <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-900 text-center">
-                  <span className="block text-[10px] text-slate-500 uppercase font-semibold">Thời Gian Học</span>
+                  <span className="block text-[10px] text-slate-500 uppercase font-semibold">{t('landing_mock_duration')}</span>
                   <span className="text-lg font-bold text-teal-400">45.5h</span>
                 </div>
               </div>
 
               {/* Mockup Heatmap layout */}
               <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-900">
-                <span className="block text-xs font-semibold text-slate-400 mb-3">Lịch học đóng góp (Heatmap)</span>
+                <span className="block text-xs font-semibold text-slate-400 mb-3">{t('landing_mock_heatmap_title')}</span>
                 <div className="flex gap-1 overflow-x-auto pb-1 justify-center">
                   {Array.from({ length: 24 }).map((_, i) => {
                     const intensities = ['bg-slate-900', 'bg-indigo-950/50', 'bg-indigo-900/60', 'bg-indigo-700/80', 'bg-indigo-500'];
@@ -567,7 +567,7 @@ export default function Landing({ onNavigate }) {
               {/* Mockup Online Users list */}
               <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-900">
                 <div className="flex justify-between items-center mb-3">
-                  <span className="text-xs font-semibold text-slate-400">Đang Học Cùng Bạn</span>
+                  <span className="text-xs font-semibold text-slate-400">{t('landing_mock_coop_title')}</span>
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-[10px] font-bold text-emerald-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                     3 Online
@@ -579,14 +579,14 @@ export default function Landing({ onNavigate }) {
                       <span className="font-semibold text-slate-200">Minh Anh</span>
                       <span className="text-[10px] px-1 rounded bg-indigo-500/10 text-indigo-300 font-bold">Lvl 15</span>
                     </div>
-                    <span className="text-slate-500 italic">Đang học Toán Giải Tích</span>
+                    <span className="text-slate-500 italic">{t('landing_mock_user1_subject')}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs p-2 rounded-lg bg-slate-900/40">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-slate-200">Hoàng Nam</span>
                       <span className="text-[10px] px-1 rounded bg-indigo-500/10 text-indigo-300 font-bold">Lvl 23</span>
                     </div>
-                    <span className="text-slate-500 italic">Đang học Lập Trình Java</span>
+                    <span className="text-slate-500 italic">{t('landing_mock_user2_subject')}</span>
                   </div>
                 </div>
               </div>
