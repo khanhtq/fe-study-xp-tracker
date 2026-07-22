@@ -211,13 +211,18 @@ function StudyCalendar({ sessions }) {
 
   const monthLabels = getMonthLabels();
 
-  // Get Level 0 - 4 based on study duration
+  // Get Level 0 - 4 based on study duration:
+  // Level 0: 0s (No study activity)
+  // Level 1: >0s to <1 hour (0 to <3600s) -> Lightest color for any study activity
+  // Level 2: 1 hour to <2 hours (3600s to <7200s) -> Next color step after 1 hour
+  // Level 3: 2 hours to <3 hours (7200s to <10800s) -> Next color step after 2 hours
+  // Level 4: 3 hours or more (>=10800s) -> Darkest / highest intensity color
   const getLevel = (durationSeconds) => {
-    if (!durationSeconds) return 0;
-    const minutes = durationSeconds / 60;
-    if (minutes <= 15) return 1;
-    if (minutes <= 30) return 2;
-    if (minutes <= 60) return 3;
+    if (!durationSeconds || durationSeconds <= 0) return 0;
+    const hours = durationSeconds / 3600;
+    if (hours < 1) return 1;
+    if (hours < 2) return 2;
+    if (hours < 3) return 3;
     return 4;
   };
 
@@ -266,11 +271,24 @@ function StudyCalendar({ sessions }) {
       const remainingMins = mins % 60;
       const durationStr = hours > 0 ? `${hours}h ${remainingMins}m` : `${mins} ${t('minutes')}`;
       
+      const level = getLevel(data.durationSeconds);
+      const levelTierMap = {
+        1: '< 1h',
+        2: '1h - 2h',
+        3: '2h - 3h',
+        4: '≥ 3h',
+      };
+
       content = (
         <div className="space-y-1">
-          <div className="font-bold text-slate-300">{dateStr}</div>
-          <div className="text-indigo-300 font-semibold">{t('duration')}: {durationStr}</div>
-          <div className="text-emerald-400 font-bold">+{data.xpEarned} XP</div>
+          <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-1">
+            <span className="font-bold text-slate-200">{dateStr}</span>
+            <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              {levelTierMap[level]}
+            </span>
+          </div>
+          <div className="text-indigo-300 font-semibold text-xs pt-0.5">{t('duration')}: {durationStr}</div>
+          <div className="text-emerald-400 font-bold text-xs">+{data.xpEarned} XP</div>
         </div>
       );
     }
