@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import SEO from './components/SEO';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -15,6 +16,7 @@ function MainApp() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+        <SEO view="landing" />
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
           <span className="text-slate-500 text-xs font-semibold uppercase tracking-widest">{t('loading_account')}</span>
@@ -23,27 +25,30 @@ function MainApp() {
     );
   }
 
-  if (!token) {
-    if (view === 'login') {
-      return (
-        <Login 
-          onToggleView={() => setView('register')} 
-          onBackToLanding={() => setView('landing')} 
-        />
-      );
-    }
-    if (view === 'register') {
-      return (
-        <Register 
-          onToggleView={() => setView('login')} 
-          onBackToLanding={() => setView('landing')} 
-        />
-      );
-    }
-    return <Landing onNavigate={setView} />;
-  }
+  const activeView = token ? 'dashboard' : view;
 
-  return <Dashboard />;
+  return (
+    <>
+      <SEO view={activeView} />
+      {!token ? (
+        view === 'login' ? (
+          <Login 
+            onToggleView={() => setView('register')} 
+            onBackToLanding={() => setView('landing')} 
+          />
+        ) : view === 'register' ? (
+          <Register 
+            onToggleView={() => setView('login')} 
+            onBackToLanding={() => setView('landing')} 
+          />
+        ) : (
+          <Landing onNavigate={setView} />
+        )
+      ) : (
+        <Dashboard />
+      )}
+    </>
+  );
 }
 
 export default function App() {
@@ -57,7 +62,3 @@ export default function App() {
     </LanguageProvider>
   );
 }
-
-
-
-

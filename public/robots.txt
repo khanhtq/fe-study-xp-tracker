@@ -1,6 +1,8 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
+Disallow: /api/
 
-# Sitemaps
-Sitemap: https://study-xp-tracker.vercel.app/sitemap.xml
+# Host & Sitemap
+Host: https://ax-study.vercel.app
+Sitemap: https://ax-study.vercel.app/sitemap.xml

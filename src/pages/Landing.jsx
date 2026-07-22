@@ -146,57 +146,63 @@ export default function Landing({ onNavigate }) {
       <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Navbar */}
-      <nav className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate('landing')}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Flame className="w-5 h-5 text-white fill-white/20" />
+      <header>
+        <nav aria-label="Thanh điều hướng chính" className="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate('landing')}>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <Flame className="w-5 h-5 text-white fill-white/20" />
+              </div>
+              <span className="font-extrabold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-text-gradient-start to-text-gradient-end">
+                Study XP Tracker
+              </span>
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-text-gradient-start to-text-gradient-end">
-              Study XP Tracker
-            </span>
+
+            <div className="flex items-center gap-4">
+              {/* Language Selector Dropdown */}
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                aria-label="Chọn ngôn ngữ"
+                className="bg-slate-900/50 hover:bg-slate-900 text-slate-300 border border-slate-800/80 backdrop-blur-md rounded-2xl px-3 py-1.5 text-sm font-semibold outline-none cursor-pointer hover:text-indigo-500 transition-colors"
+              >
+                <option value="vi" className="bg-slate-950 text-slate-300">Tiếng Việt</option>
+                <option value="en" className="bg-slate-950 text-slate-300">English</option>
+                <option value="zh" className="bg-slate-950 text-slate-300">简体中文</option>
+              </select>
+
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                aria-label="Chuyển đổi giao diện sáng tối"
+                className="p-2.5 rounded-2xl bg-slate-900/50 hover:bg-slate-900 text-slate-400 hover:text-indigo-500 border border-slate-800/80 backdrop-blur-md transition-colors flex items-center justify-center cursor-pointer"
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-4 h-4 text-indigo-600" />
+                ) : (
+                  <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                )}
+              </button>
+
+              {/* Auth Actions */}
+              <button 
+                onClick={() => onNavigate('login')}
+                className="hidden sm:block text-sm font-bold text-slate-300 hover:text-white px-3 py-1.5 cursor-pointer"
+              >
+                {t('landing_cta_login')}
+              </button>
+              <button 
+                onClick={() => onNavigate('register')}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-4 py-2 rounded-2xl transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
+              >
+                {t('landing_cta_get_started')}
+              </button>
+            </div>
           </div>
+        </nav>
+      </header>
 
-          <div className="flex items-center gap-4">
-            {/* Language Selector Dropdown */}
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="bg-slate-900/50 hover:bg-slate-900 text-slate-300 border border-slate-800/80 backdrop-blur-md rounded-2xl px-3 py-1.5 text-sm font-semibold outline-none cursor-pointer hover:text-indigo-500 transition-colors"
-            >
-              <option value="vi" className="bg-slate-950 text-slate-300">Tiếng Việt</option>
-              <option value="en" className="bg-slate-950 text-slate-300">English</option>
-              <option value="zh" className="bg-slate-950 text-slate-300">简体中文</option>
-            </select>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-2xl bg-slate-900/50 hover:bg-slate-900 text-slate-400 hover:text-indigo-500 border border-slate-800/80 backdrop-blur-md transition-colors flex items-center justify-center cursor-pointer"
-            >
-              {theme === 'light' ? (
-                <Moon className="w-4 h-4 text-indigo-600" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
-              )}
-            </button>
-
-            {/* Auth Actions */}
-            <button 
-              onClick={() => onNavigate('login')}
-              className="hidden sm:block text-sm font-bold text-slate-300 hover:text-white px-3 py-1.5 cursor-pointer"
-            >
-              {t('landing_cta_login')}
-            </button>
-            <button 
-              onClick={() => onNavigate('register')}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-4 py-2 rounded-2xl transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
-            >
-              {t('landing_cta_get_started')}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <main>
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 text-center relative z-10">
@@ -594,6 +600,7 @@ export default function Landing({ onNavigate }) {
           </motion.div>
         </div>
       </section>
+    </main>
 
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 pt-10 mt-20 relative z-10 text-center text-slate-500 text-xs">
