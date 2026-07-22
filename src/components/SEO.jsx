@@ -72,6 +72,23 @@ const metaContentByView = {
       keywords: '学习仪表板, 番茄钟, 学习统计',
     },
   },
+  admin: {
+    vi: {
+      title: 'Admin Dashboard | Study XP Tracker',
+      description: 'Trang quản trị hệ thống, theo dõi người dùng đang online realtime và thống kê lịch sử học tập.',
+      keywords: 'admin study xp, trang quan tri study xp, online user tracking',
+    },
+    en: {
+      title: 'Admin Dashboard | Study XP Tracker',
+      description: 'System administration dashboard for realtime online user tracking and detailed study session logs.',
+      keywords: 'admin dashboard, study tracker admin, user study analytics',
+    },
+    zh: {
+      title: '管理员仪表板 | Study XP Tracker',
+      description: '系统管理仪表板，用于实时在线用户追踪和详细学习记录统计。',
+      keywords: '管理员仪表板, 在线用户追踪',
+    },
+  },
 };
 
 export default function SEO({ view = 'landing' }) {

@@ -8,7 +8,7 @@ import StudyTimer from '../components/StudyTimer';
 import ManualSessionForm from '../components/ManualSessionForm';
 import SessionHistoryList from '../components/SessionHistoryList';
 import OnlineUsersList from '../components/OnlineUsersList';
-import { LogOut, User, Flame, X, Sun, Moon } from 'lucide-react';
+import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const calculateXpEarned = (durationSeconds) => {
@@ -20,7 +20,7 @@ const calculateXpEarned = (durationSeconds) => {
   return Math.round(baseXp);
 };
 
-export default function Dashboard() {
+export default function Dashboard({ onNavigateAdmin }) {
   const { user, progress, logout, refreshProgress, activeSession } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -142,6 +142,17 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            {user?.role === 'ROLE_ADMIN' && (
+              <button
+                onClick={onNavigateAdmin}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-bold transition-all"
+                title="Admin Dashboard"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-400" />
+                <span>Admin</span>
+              </button>
+            )}
+
             <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-1.5 text-sm">
               <User className="w-4 h-4 text-slate-500" />
               <span className="text-slate-300 font-semibold">{user?.displayName}</span>

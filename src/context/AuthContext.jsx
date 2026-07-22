@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
         id: data.userId,
         email: data.email,
         displayName: data.displayName,
+        role: data.role || 'ROLE_USER',
       });
     } catch (err) {
       console.error('Error fetching progress:', err);
@@ -69,12 +70,14 @@ export const AuthProvider = ({ children }) => {
       id: res.userId,
       email: res.email,
       displayName: res.displayName,
+      role: res.role || 'ROLE_USER',
     }));
     setToken(res.token);
     setUser({
       id: res.userId,
       email: res.email,
       displayName: res.displayName,
+      role: res.role || 'ROLE_USER',
     });
   };
 
@@ -85,12 +88,14 @@ export const AuthProvider = ({ children }) => {
       id: res.userId,
       email: res.email,
       displayName: res.displayName,
+      role: res.role || 'ROLE_USER',
     }));
     setToken(res.token);
     setUser({
       id: res.userId,
       email: res.email,
       displayName: res.displayName,
+      role: res.role || 'ROLE_USER',
     });
   };
 

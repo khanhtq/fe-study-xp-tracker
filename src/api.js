@@ -150,3 +150,10 @@ export const sessionApi = {
       method: 'POST',
     }),
 };
+
+export const adminApi = {
+  getOverviewStats: () => apiCall('/admin/stats/overview'),
+  getOnlineUsersDetailed: () => apiCall('/admin/users/online'),
+  getUserStatsList: (range = 'all') => apiCall(`/admin/users/stats?range=${range}`),
+  getUserSessions: (userId) => apiCall(`/admin/users/${userId}/sessions`),
+};

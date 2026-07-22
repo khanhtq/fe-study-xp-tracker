@@ -7,9 +7,10 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 function MainApp() {
-  const { token, loading } = useAuth();
+  const { user, token, loading } = useAuth();
   const [view, setView] = useState('landing');
   const { t } = useLanguage();
 
@@ -25,7 +26,7 @@ function MainApp() {
     );
   }
 
-  const activeView = token ? 'dashboard' : view;
+  const activeView = token ? (view === 'admin' ? 'admin' : 'dashboard') : view;
 
   return (
     <>
@@ -44,8 +45,10 @@ function MainApp() {
         ) : (
           <Landing onNavigate={setView} />
         )
+      ) : view === 'admin' && user?.role === 'ROLE_ADMIN' ? (
+        <AdminDashboard onBackToDashboard={() => setView('dashboard')} />
       ) : (
-        <Dashboard />
+        <Dashboard onNavigateAdmin={() => setView('admin')} />
       )}
     </>
   );
