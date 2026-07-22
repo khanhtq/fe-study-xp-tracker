@@ -7,14 +7,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 function OnlineUserRow({ user }) {
   const { t } = useLanguage();
   const [elapsed, setElapsed] = useState('');
+  const [liveLevel, setLiveLevel] = useState(user.currentLevel || 1);
 
   useEffect(() => {
     if (!user.isStudying || !user.studyStartedAt) {
       setElapsed('');
+      setLiveLevel(user.currentLevel || 1);
       return;
     }
 
-    const calculateElapsed = () => {
+    const calculateXpEarned = (durationSeconds) => {
+      const minutes = durationSeconds / 60;
+      const baseXp = minutes * 10;
+      if (durationSeconds >= 1500) {
+        return Math.round(baseXp * 1.1);
+      }
+      return Math.round(baseXp);
+    };
+
+    const getXpRequiredForNextLevel = (level) => {
+      return Math.round(100 * Math.pow(level, 1.5));
+    };
+
+    const updateRealtimeStats = () => {
       const start = new Date(user.studyStartedAt).getTime();
       const now = Date.now();
       const diffSeconds = Math.max(0, Math.floor((now - start) / 1000));
@@ -28,16 +43,35 @@ function OnlineUserRow({ user }) {
       } else {
         setElapsed(`${mins}m ${secs}s`);
       }
+
+      // Calculate real-time level taking into account active session XP
+      const xpEarned = calculateXpEarned(diffSeconds);
+      let tempXp = (user.currentXp || 0) + xpEarned;
+      let tempLevel = user.currentLevel || 1;
+
+      while (true) {
+        const required = getXpRequiredForNextLevel(tempLevel);
+        if (tempXp >= required) {
+          tempXp -= required;
+          tempLevel++;
+        } else {
+          break;
+        }
+      }
+
+      setLiveLevel(tempLevel);
     };
 
-    calculateElapsed();
-    const interval = setInterval(calculateElapsed, 1000);
+    updateRealtimeStats();
+    const interval = setInterval(updateRealtimeStats, 1000);
     return () => clearInterval(interval);
-  }, [user.isStudying, user.studyStartedAt]);
+  }, [user.isStudying, user.studyStartedAt, user.currentLevel, user.currentXp]);
 
   const initials = user.displayName
     ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     : 'U';
+
+  const isLevelBoosted = liveLevel > (user.currentLevel || 1);
 
   return (
     <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/40 border border-slate-800/40 hover:border-slate-700/60 transition-all gap-3">
@@ -58,9 +92,13 @@ function OnlineUserRow({ user }) {
         <div>
           <span className="font-semibold text-sm text-slate-200 flex items-center gap-1.5">
             <span>{user.displayName}</span>
-            {user.currentLevel && (
-              <span className="px-1.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-400 font-extrabold text-[10px] border border-indigo-500/20">
-                {t('level_short')} {user.currentLevel}
+            {liveLevel && (
+              <span className={`px-1.5 py-0.5 rounded-lg font-extrabold text-[10px] border transition-all ${
+                isLevelBoosted
+                  ? 'bg-gradient-to-r from-amber-500/20 to-emerald-500/20 text-amber-300 border-amber-500/40 animate-pulse shadow-sm shadow-amber-500/20'
+                  : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+              }`}>
+                {t('level_short')} {liveLevel} {isLevelBoosted && '⚡'}
               </span>
             )}
           </span>
@@ -111,7 +149,7 @@ function OnlineUsersList() {
 
   useEffect(() => {
     fetchOnlineUsers();
-    const interval = setInterval(fetchOnlineUsers, 10000); // refresh every 10 seconds
+    const interval = setInterval(fetchOnlineUsers, 3000); // refresh every 3 seconds
     return () => clearInterval(interval);
   }, []);
 
