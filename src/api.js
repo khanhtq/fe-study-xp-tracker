@@ -145,4 +145,8 @@ export const sessionApi = {
     }),
   getActive: () => apiCall('/study-sessions/active'),
   getHistory: () => apiCall('/study-sessions'),
+  sendHeartbeat: (id) => 
+    apiCall(`/study-sessions/${id}/heartbeat`, {
+      method: 'POST',
+    }),
 };

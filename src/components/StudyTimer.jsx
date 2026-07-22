@@ -57,6 +57,55 @@ function StudyTimer({ onStopResult }) {
     };
   }, [activeSession, localOffset]);
 
+  // Heartbeat loop (10s) + pagehide event listener for tab closure
+  useEffect(() => {
+    if (!activeSession) return;
+
+    const sendHeartbeatPing = () => {
+      sessionApi.sendHeartbeat(activeSession.id).catch((err) => {
+        // If session was auto-closed or not found, sync with server
+        if (err.status === 404 || err.status === 400) {
+          setActiveSession(null);
+          refreshProgress();
+        }
+      });
+    };
+
+    // Send immediate heartbeat on start/resume
+    sendHeartbeatPing();
+
+    const heartbeatInterval = setInterval(sendHeartbeatPing, 10000);
+
+    const handlePageHide = () => {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+      const heartbeatUrl = `${cleanBaseUrl}/study-sessions/${activeSession.id}/heartbeat`;
+      
+      const token = localStorage.getItem('token');
+      if (token) {
+        if ('keepalive' in Request.prototype) {
+          fetch(heartbeatUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            keepalive: true
+          }).catch(() => {});
+        } else if (navigator.sendBeacon) {
+          navigator.sendBeacon(heartbeatUrl);
+        }
+      }
+    };
+
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, [activeSession, setActiveSession, refreshProgress]);
+
   const handleStart = async (e) => {
     e.preventDefault();
     setIsStarting(true);

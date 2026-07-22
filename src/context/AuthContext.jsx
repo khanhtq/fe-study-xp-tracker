@@ -94,7 +94,14 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (activeSession) {
+      try {
+        await sessionApi.stop(activeSession.id);
+      } catch (err) {
+        console.warn('Failed to stop active session during logout:', err);
+      }
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setToken(null);

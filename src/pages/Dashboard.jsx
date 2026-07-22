@@ -28,6 +28,7 @@ export default function Dashboard() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [sessionToast, setSessionToast] = useState(null);
   const [liveXpProgress, setLiveXpProgress] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -171,11 +172,15 @@ export default function Dashboard() {
             </button>
             
             <button
-              onClick={logout}
-              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors cursor-pointer"
+              onClick={async () => {
+                setIsLoggingOut(true);
+                await logout();
+              }}
+              disabled={isLoggingOut}
+              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('logout')}</span>
+              <span className="hidden sm:inline">{isLoggingOut ? t('loading') || '...' : t('logout')}</span>
             </button>
           </div>
         </div>
