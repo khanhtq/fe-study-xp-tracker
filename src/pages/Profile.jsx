@@ -8,7 +8,7 @@ import SEO from '../components/SEO';
 import { Sun, Moon, ArrowLeft, User, Shield, Trophy, Settings, Lock, Check } from 'lucide-react';
 
 export default function Profile({ onBackToDashboard }) {
-  const { user, refreshUserProgress } = useAuth();
+  const { user, progress, refreshUserProgress } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { t } = useLanguage();
 
@@ -202,7 +202,7 @@ export default function Profile({ onBackToDashboard }) {
                 )}
               </div>
               <span className="absolute bottom-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-950 shadow">
-                Lvl {user?.currentLevel || 1}
+                Lvl {progress?.currentLevel ?? user?.currentLevel ?? 1}
               </span>
             </div>
 
@@ -220,7 +220,7 @@ export default function Profile({ onBackToDashboard }) {
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-4 text-xs">
                 <span className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-slate-300">
-                  Tổng XP: <strong className="text-amber-400">{user?.totalXp || 0} XP</strong>
+                  Tổng XP: <strong className="text-amber-400">{(progress?.totalXp ?? user?.totalXp ?? 0).toLocaleString()} XP</strong>
                 </span>
                 <span className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-slate-300">
                   Mục tiêu ngày: <strong className="text-indigo-400">{user?.dailyGoalMinutes || 60} phút</strong>

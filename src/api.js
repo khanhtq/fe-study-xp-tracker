@@ -307,6 +307,19 @@ export const userApi = {
     }
     return apiCall('/users/online');
   },
+  searchUsers: (query) => {
+    if (!query || !query.trim()) return Promise.resolve([]);
+    if (isGuestMode()) {
+      return apiCall(`/users/search?q=${encodeURIComponent(query)}`).catch(() => []);
+    }
+    return apiCall(`/users/search?q=${encodeURIComponent(query)}`);
+  },
+  getPublicProfile: (userId) => {
+    if (!userId || userId === 'guest') {
+      return Promise.reject(new Error('Tài khoản khách không có hồ sơ công khai'));
+    }
+    return apiCall(`/users/${userId}/public-profile`);
+  },
 };
 
 export const sessionApi = {

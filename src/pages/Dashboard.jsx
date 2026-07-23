@@ -8,8 +8,10 @@ import StudyTimer from '../components/StudyTimer';
 import ManualSessionForm from '../components/ManualSessionForm';
 import SessionHistoryList from '../components/SessionHistoryList';
 import OnlineUsersList from '../components/OnlineUsersList';
+import UserSearchModal from '../components/UserSearchModal';
+import PublicProfileModal from '../components/PublicProfileModal';
 import Footer from '../components/Footer';
-import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck } from 'lucide-react';
+import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const calculateXpEarned = (durationSeconds) => {
@@ -21,6 +23,16 @@ const calculateXpEarned = (durationSeconds) => {
   return Math.round(baseXp);
 };
 
+const getFullAvatarUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const backendOrigin = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:8080';
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${backendOrigin}${cleanUrl}`;
+};
+
 export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavigateProfile }) {
   const { user, progress, logout, refreshProgress, activeSession } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -30,6 +42,8 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
   const [sessionToast, setSessionToast] = useState(null);
   const [liveXpProgress, setLiveXpProgress] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -140,6 +154,15 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-slate-300 hover:text-white text-xs sm:text-sm transition-all cursor-pointer shadow-md"
+              title={t('search_members')}
+            >
+              <Search className="w-4 h-4 text-indigo-400" />
+              <span className="hidden md:inline font-semibold">{t('search_members')}</span>
+            </button>
+
             {user?.role === 'ROLE_ADMIN' && (
               <button
                 onClick={onNavigateAdmin}
@@ -173,7 +196,7 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
               <div className="w-6 h-6 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center text-xs text-white font-bold">
                 {user?.avatarUrl ? (
                   <img
-                    src={user.avatarUrl.startsWith('http') ? user.avatarUrl : `http://localhost:8080${user.avatarUrl}`}
+                    src={getFullAvatarUrl(user.avatarUrl)}
                     alt="Avatar"
                     className="w-full h-full object-cover rounded-full"
                     onError={(e) => {
@@ -186,6 +209,9 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
                 )}
               </div>
               <span className="text-slate-200 font-semibold text-xs sm:text-sm">{user?.displayName}</span>
+              <span className="px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-extrabold text-[10px]">
+                {t('level_short')} {progress?.currentLevel ?? user?.currentLevel ?? 1}
+              </span>
               {user?.selectedTitle && (
                 <span className="hidden md:inline-block text-[10px] font-medium text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
                   {user.selectedTitle}
@@ -251,7 +277,10 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
           <div className="lg:col-span-1 space-y-8">
             <StudyTimer onStopResult={handleStopResult} />
             <ManualSessionForm onSuccess={handleManualSuccess} />
-            <OnlineUsersList />
+            <OnlineUsersList 
+              onSelectUser={(userId) => setSelectedUserId(userId)} 
+              onOpenSearch={() => setIsSearchOpen(true)} 
+            />
           </div>
 
           {/* Right Column: Statistics & History */}
@@ -272,6 +301,19 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
       </main>
 
       <Footer />
+
+      {/* User Search Modal */}
+      <UserSearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+        onSelectUser={(userId) => setSelectedUserId(userId)} 
+      />
+
+      {/* Public Profile Modal */}
+      <PublicProfileModal 
+        userId={selectedUserId} 
+        onClose={() => setSelectedUserId(null)} 
+      />
 
       {/* Session Result Toast */}
       <AnimatePresence>

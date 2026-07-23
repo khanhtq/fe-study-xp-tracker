@@ -1,18 +1,29 @@
 import React, { useState, useEffect, memo } from 'react';
 import { userApi } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import { Users, BookOpen, Clock, Loader2 } from 'lucide-react';
+import { Users, BookOpen, Clock, Loader2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function OnlineUserRow({ user }) {
+const getFullAvatarUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const backendOrigin = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:8080';
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${backendOrigin}${cleanUrl}`;
+};
+
+function OnlineUserRow({ user, onSelectUser }) {
   const { t } = useLanguage();
   const [elapsed, setElapsed] = useState('');
-  const [liveLevel, setLiveLevel] = useState(user.currentLevel || 1);
+  const [liveLevel, setLiveLevel] = useState(user.currentLevel || user.baseLevel || 1);
+  const [imgErr, setImgErr] = useState(false);
 
   useEffect(() => {
     if (!user.isStudying || !user.studyStartedAt) {
       setElapsed('');
-      setLiveLevel(user.currentLevel || 1);
+      setLiveLevel(user.currentLevel || user.baseLevel || 1);
       return;
     }
 
@@ -44,10 +55,10 @@ function OnlineUserRow({ user }) {
         setElapsed(`${mins}m ${secs}s`);
       }
 
-      // Calculate real-time level taking into account active session XP
+      // Calculate real-time level taking into account active session XP from baseLevel
       const xpEarned = calculateXpEarned(diffSeconds);
       let tempXp = (user.currentXp || 0) + xpEarned;
-      let tempLevel = user.currentLevel || 1;
+      let tempLevel = user.baseLevel || 1;
 
       while (true) {
         const required = getXpRequiredForNextLevel(tempLevel);
@@ -65,22 +76,35 @@ function OnlineUserRow({ user }) {
     updateRealtimeStats();
     const interval = setInterval(updateRealtimeStats, 1000);
     return () => clearInterval(interval);
-  }, [user.isStudying, user.studyStartedAt, user.currentLevel, user.currentXp]);
+  }, [user.isStudying, user.studyStartedAt, user.currentLevel, user.baseLevel, user.currentXp]);
 
   const initials = user.displayName
     ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     : 'U';
 
-  const isLevelBoosted = liveLevel > (user.currentLevel || 1);
+  const baseLevel = user.baseLevel || user.currentLevel || 1;
+  const isLevelBoosted = liveLevel > baseLevel;
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/40 border border-slate-800/40 hover:border-slate-700/60 transition-all gap-3">
-      <div className="flex items-center gap-3">
+    <div 
+      onClick={() => onSelectUser && onSelectUser(user.userId)}
+      className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/40 border border-slate-800/40 hover:border-indigo-500/40 hover:bg-slate-800/50 transition-all gap-3 cursor-pointer group"
+    >
+      <div className="flex items-center gap-3 min-w-0">
         {/* Avatar with status indicator */}
-        <div className="relative">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-800 to-indigo-950 border border-slate-700/50 flex items-center justify-center font-bold text-sm text-indigo-300">
-            {initials}
-          </div>
+        <div className="relative shrink-0">
+          {user.avatarUrl && !imgErr ? (
+            <img 
+              src={getFullAvatarUrl(user.avatarUrl)} 
+              alt={user.displayName} 
+              onError={() => setImgErr(true)}
+              className="w-10 h-10 rounded-xl object-cover border border-slate-700/50 shadow-sm"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-800 to-indigo-950 border border-slate-700/50 flex items-center justify-center font-bold text-sm text-indigo-300">
+              {initials}
+            </div>
+          )}
           {/* Status Dot */}
           <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-950 ${
             user.isStudying
@@ -89,11 +113,11 @@ function OnlineUserRow({ user }) {
           }`} />
         </div>
 
-        <div>
-          <span className="font-semibold text-sm text-slate-200 flex items-center gap-1.5">
-            <span>{user.displayName}</span>
+        <div className="min-w-0">
+          <span className="font-semibold text-sm text-slate-200 group-hover:text-indigo-300 transition-colors flex items-center gap-1.5 truncate">
+            <span className="truncate">{user.displayName}</span>
             {liveLevel && (
-              <span className={`px-1.5 py-0.5 rounded-lg font-extrabold text-[10px] border transition-all ${
+              <span className={`shrink-0 px-1.5 py-0.5 rounded-lg font-extrabold text-[10px] border transition-all ${
                 isLevelBoosted
                   ? 'bg-gradient-to-r from-amber-500/20 to-emerald-500/20 text-amber-300 border-amber-500/40 animate-pulse shadow-sm shadow-amber-500/20'
                   : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
@@ -103,12 +127,12 @@ function OnlineUserRow({ user }) {
             )}
           </span>
           {user.isStudying ? (
-            <span className="text-[11px] text-indigo-300 font-medium flex items-center gap-1 mt-0.5">
-              <BookOpen className="w-3 h-3 text-indigo-400" />
-              {t('studying_subject')}: {user.currentSubject || t('timer_placeholder')}
+            <span className="text-[11px] text-indigo-300 font-medium flex items-center gap-1 mt-0.5 truncate">
+              <BookOpen className="w-3 h-3 text-indigo-400 shrink-0" />
+              <span className="truncate">{t('studying_subject')}: {user.currentSubject || t('timer_placeholder')}</span>
             </span>
           ) : (
-            <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+            <span className="text-[11px] text-slate-500 font-medium block mt-0.5 truncate">
               {t('status_active_idle')}
             </span>
           )}
@@ -125,7 +149,7 @@ function OnlineUserRow({ user }) {
   );
 }
 
-function OnlineUsersList() {
+function OnlineUsersList({ onSelectUser, onOpenSearch }) {
   const { t } = useLanguage();
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -162,9 +186,20 @@ function OnlineUsersList() {
           <Users className="w-5 h-5 text-emerald-400" />
           {t('online_title')}
         </span>
-        <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-900 border border-slate-800 rounded-full text-slate-400">
-          {onlineUsers.length} {t('online_users')}
-        </span>
+        <div className="flex items-center gap-2">
+          {onOpenSearch && (
+            <button
+              onClick={onOpenSearch}
+              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/40 transition-all"
+              title={t('search_members')}
+            >
+              <Search className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-900 border border-slate-800 rounded-full text-slate-400">
+            {onlineUsers.length} {t('online_users')}
+          </span>
+        </div>
       </h3>
 
       {loading && onlineUsers.length === 0 ? (
@@ -186,7 +221,7 @@ function OnlineUsersList() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <OnlineUserRow user={user} />
+                <OnlineUserRow user={user} onSelectUser={onSelectUser} />
               </motion.div>
             ))}
           </AnimatePresence>

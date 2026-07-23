@@ -44,6 +44,9 @@ export const AuthProvider = ({ children }) => {
           soundEnabled: data.soundEnabled,
           authProvider: data.authProvider,
           role: data.role || 'ROLE_USER',
+          currentLevel: data.currentLevel,
+          currentXp: data.currentXp,
+          totalXp: data.totalXp,
         });
       } else {
         const guestUserStr = localStorage.getItem('guest_user');
@@ -57,6 +60,9 @@ export const AuthProvider = ({ children }) => {
           selectedTitle: data.selectedTitle,
           themeAccent: data.themeAccent,
           soundEnabled: data.soundEnabled,
+          currentLevel: data.currentLevel,
+          currentXp: data.currentXp,
+          totalXp: data.totalXp,
         });
       }
     } catch (err) {
