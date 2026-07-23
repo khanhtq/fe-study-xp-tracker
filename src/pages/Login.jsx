@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getErrorMessage } from '../api';
 import { ShieldAlert, LogIn, UserPlus, Flame, Sun, Moon, UserCheck, User } from 'lucide-react';
 
-export default function Login({ onToggleView, onBackToLanding, onNavigateVerifyOtp }) {
+export default function Login({ onToggleView, onBackToLanding, onNavigateVerifyOtp, onNavigateForgotPassword }) {
   const { login, loginAsGuest } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -174,9 +174,20 @@ export default function Login({ onToggleView, onBackToLanding, onNavigateVerifyO
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  {t('password')}
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    {t('password')}
+                  </label>
+                  {onNavigateForgotPassword && (
+                    <button
+                      type="button"
+                      onClick={onNavigateForgotPassword}
+                      className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors cursor-pointer"
+                    >
+                      Quên mật khẩu?
+                    </button>
+                  )}
+                </div>
                 <input
                   type="password"
                   required

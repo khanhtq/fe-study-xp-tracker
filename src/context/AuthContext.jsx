@@ -255,6 +255,18 @@ export const AuthProvider = ({ children }) => {
     return await authApi.resendOtp(email);
   };
 
+  const forgotPassword = async (email) => {
+    return await authApi.forgotPassword(email);
+  };
+
+  const verifyResetOtp = async (email, otp) => {
+    return await authApi.verifyResetOtp(email, otp);
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    return await authApi.resetPassword(email, otp, newPassword);
+  };
+
   const logout = async () => {
     if (activeSession) {
       try {
@@ -293,6 +305,9 @@ export const AuthProvider = ({ children }) => {
       register,
       verifyOtp,
       resendOtp,
+      forgotPassword,
+      verifyResetOtp,
+      resetPassword,
       logout,
       refreshProgress,
       setActiveSession: updateActiveSession

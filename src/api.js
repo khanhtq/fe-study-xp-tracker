@@ -210,6 +210,21 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ email }),
     }),
+  forgotPassword: (email) =>
+    apiCall('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+  verifyResetOtp: (email, otp) =>
+    apiCall('/auth/verify-reset-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    }),
+  resetPassword: (email, otp, newPassword) =>
+    apiCall('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp, newPassword }),
+    }),
   login: (email, password) => 
     apiCall('/auth/login', {
       method: 'POST',

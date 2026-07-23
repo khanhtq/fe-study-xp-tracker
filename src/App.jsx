@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 import VerifyOtp from './pages/VerifyOtp';
+import ForgotPassword from './pages/ForgotPassword';
 
 function MainApp() {
   const { user, token, loading } = useAuth();
@@ -78,11 +79,16 @@ function MainApp() {
             onBackToRegister={() => { setPendingVerifyEmail(''); setView('register'); }} 
             onSuccess={handleVerifySuccess}
           />
+        ) : view === 'forgot-password' ? (
+          <ForgotPassword 
+            onBackToLogin={() => setView('login')} 
+          />
         ) : view === 'login' ? (
           <Login 
             onToggleView={() => setView('register')} 
             onBackToLanding={() => setView('landing')} 
             onNavigateVerifyOtp={handleNavigateVerifyOtp}
+            onNavigateForgotPassword={() => setView('forgot-password')}
           />
         ) : view === 'register' ? (
           <Register 
