@@ -5,12 +5,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { userApi, getErrorMessage } from '../api';
 import AvatarUploader from '../components/AvatarUploader';
 import SEO from '../components/SEO';
-import { Sun, Moon, ArrowLeft, User, Shield, Trophy, Settings, Lock, Check } from 'lucide-react';
+import { Sun, Moon, ArrowLeft, User, Shield, Trophy, Settings, Lock, Check, Globe } from 'lucide-react';
 
 export default function Profile({ onBackToDashboard }) {
   const { user, progress, refreshUserProgress } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'security' | 'titles' | 'preferences'
 
@@ -29,6 +29,7 @@ export default function Profile({ onBackToDashboard }) {
   const [selectedTitle, setSelectedTitle] = useState('Tân Binh Tập Trung');
   const [themeAccent, setThemeAccent] = useState('indigo');
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [preferredLanguage, setPreferredLanguage] = useState('en');
   const [availableTitles, setAvailableTitles] = useState([]);
 
   // UI status
@@ -45,8 +46,9 @@ export default function Profile({ onBackToDashboard }) {
       setSelectedTitle(user.selectedTitle || 'Tân Binh Tập Trung');
       setThemeAccent(user.themeAccent || 'indigo');
       setSoundEnabled(user.soundEnabled !== undefined ? user.soundEnabled : true);
+      setPreferredLanguage(user.preferredLanguage || language || 'en');
     }
-  }, [user]);
+  }, [user, language]);
 
   useEffect(() => {
     userApi
@@ -69,9 +71,13 @@ export default function Profile({ onBackToDashboard }) {
         selectedTitle,
         themeAccent,
         soundEnabled,
+        preferredLanguage,
       });
+      if (preferredLanguage && preferredLanguage !== language) {
+        setLanguage(preferredLanguage);
+      }
       await refreshUserProgress();
-      setSuccessMsg('Đã cập nhật thông tin cá nhân thành công.');
+      setSuccessMsg(t('profile_toast_info_success'));
     } catch (err) {
       setErrorMsg(getErrorMessage(err, 'error_unknown', t));
     } finally {
@@ -86,7 +92,7 @@ export default function Profile({ onBackToDashboard }) {
     try {
       await userApi.uploadAvatar(file);
       await refreshUserProgress();
-      setSuccessMsg('Đã cập nhật ảnh đại diện mới thành công.');
+      setSuccessMsg(t('profile_toast_avatar_success'));
     } catch (err) {
       setErrorMsg(getErrorMessage(err, 'error_unknown', t));
     } finally {
@@ -101,7 +107,7 @@ export default function Profile({ onBackToDashboard }) {
     try {
       await userApi.updateProfile({ avatarUrl });
       await refreshUserProgress();
-      setSuccessMsg('Đã thay đổi Avatar thành công.');
+      setSuccessMsg(t('profile_toast_preset_avatar_success'));
     } catch (err) {
       setErrorMsg(getErrorMessage(err, 'error_unknown', t));
     } finally {
@@ -116,7 +122,7 @@ export default function Profile({ onBackToDashboard }) {
     setErrorMsg('');
     try {
       await userApi.changePassword(currentPassword, newPassword, confirmPassword);
-      setSuccessMsg('Đã đổi mật khẩu thành công. Vui lòng ghi nhớ mật khẩu mới.');
+      setSuccessMsg(t('profile_toast_password_success'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -135,7 +141,7 @@ export default function Profile({ onBackToDashboard }) {
     try {
       await userApi.updateProfile({ selectedTitle: titleName });
       await refreshUserProgress();
-      setSuccessMsg(`Đã trang bị danh hiệu "${titleName}".`);
+      setSuccessMsg(`${t('profile_toast_title_success')} "${titleName}".`);
     } catch (err) {
       setErrorMsg(getErrorMessage(err, 'error_unknown', t));
     } finally {
@@ -154,7 +160,7 @@ export default function Profile({ onBackToDashboard }) {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <SEO title="Trang Cá Nhân & Cài Đặt - Study XP Tracker" description="Quản lý thông tin tài khoản, avatar, danh hiệu và tùy chỉnh trải nghiệm học tập." />
+      <SEO title={t('profile_seo_title')} description={t('profile_seo_desc')} />
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Top Back & Theme Navigation */}
@@ -165,7 +171,7 @@ export default function Profile({ onBackToDashboard }) {
               className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-indigo-400 rounded-2xl text-xs font-bold transition-all shadow-md cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Quay Lại Dashboard</span>
+              <span>{t('back_to_dashboard')}</span>
             </button>
           ) : <div />}
 
@@ -202,16 +208,16 @@ export default function Profile({ onBackToDashboard }) {
                 )}
               </div>
               <span className="absolute bottom-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-950 shadow">
-                Lvl {progress?.currentLevel ?? user?.currentLevel ?? 1}
+                {t('level_short')} {progress?.currentLevel ?? user?.currentLevel ?? 1}
               </span>
             </div>
 
             <div className="text-center sm:text-left flex-1">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">{user?.displayName || 'Người dùng'}</h1>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100">{user?.displayName || t('profile_user_default')}</h1>
                 {user?.selectedTitle && (
                   <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                    {user.selectedTitle}
+                    {t('title_' + user.selectedTitle) || user.selectedTitle}
                   </span>
                 )}
               </div>
@@ -220,10 +226,10 @@ export default function Profile({ onBackToDashboard }) {
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-4 text-xs">
                 <span className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-slate-300">
-                  Tổng XP: <strong className="text-amber-400">{(progress?.totalXp ?? user?.totalXp ?? 0).toLocaleString()} XP</strong>
+                  {t('profile_total_xp')} <strong className="text-amber-400">{(progress?.totalXp ?? user?.totalXp ?? 0).toLocaleString()} XP</strong>
                 </span>
                 <span className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-slate-300">
-                  Mục tiêu ngày: <strong className="text-indigo-400">{user?.dailyGoalMinutes || 60} phút</strong>
+                  {t('profile_daily_goal')} <strong className="text-indigo-400">{user?.dailyGoalMinutes || 60} {t('minutes')}</strong>
                 </span>
               </div>
             </div>
@@ -252,10 +258,10 @@ export default function Profile({ onBackToDashboard }) {
         {/* Navigation Tabs */}
         <div className="flex border-b border-slate-800 overflow-x-auto no-scrollbar gap-2 sm:gap-4 pb-2">
           {[
-            { id: 'profile', label: 'Hồ Sơ Cá Nhân', icon: User },
-            { id: 'security', label: 'Bảo Mật & Mật Khẩu', icon: Lock },
-            { id: 'titles', label: 'Danh Hiệu RPG', icon: Trophy },
-            { id: 'preferences', label: 'Cài Đặt Trải Nghiệm', icon: Settings },
+            { id: 'profile', label: t('profile_tab_info'), icon: User },
+            { id: 'security', label: t('profile_tab_security'), icon: Lock },
+            { id: 'titles', label: t('profile_tab_titles'), icon: Trophy },
+            { id: 'preferences', label: t('profile_tab_preferences'), icon: Settings },
           ].map((tab) => {
             const IconComponent = tab.icon;
             return (
@@ -292,60 +298,60 @@ export default function Profile({ onBackToDashboard }) {
             <form onSubmit={handleUpdateProfile} className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
               <h3 className="text-lg font-bold text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
                 <User className="w-5 h-5 text-indigo-500" />
-                <span>Chỉnh Sửa Thông Tin Cá Nhân</span>
+                <span>{t('profile_edit_info')}</span>
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Tên Hiển Thị (Display Name):</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_display_name_label')}</label>
                   <input
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     required
-                    placeholder="Ví dụ: Nguyễn Văn A"
+                    placeholder={t('profile_display_name_placeholder')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Mục Tiêu Học Tập Hàng Ngày (Phút):</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_daily_goal_label')}</label>
                   <select
                     value={dailyGoalMinutes}
                     onChange={(e) => setDailyGoalMinutes(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value={30}>30 phút / ngày (Cơ bản)</option>
-                    <option value={60}>60 phút / ngày (Tiêu chuẩn)</option>
-                    <option value={90}>90 phút / ngày (Tăng tốc)</option>
-                    <option value={120}>120 phút / ngày (Chăm chỉ)</option>
-                    <option value={180}>180 phút / ngày (Siêu luyện)</option>
+                    <option value={30}>{t('profile_goal_30')}</option>
+                    <option value={60}>{t('profile_goal_60')}</option>
+                    <option value={90}>{t('profile_goal_90')}</option>
+                    <option value={120}>{t('profile_goal_120')}</option>
+                    <option value={180}>{t('profile_goal_180')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2">Môn Học / Chủ Đề Ưu Thích:</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_favorite_subjects_label')}</label>
                 <input
                   type="text"
                   value={favoriteSubjects}
                   onChange={(e) => setFavoriteSubjects(e.target.value)}
-                  placeholder="Ví dụ: Lập trình Java, Tiếng Anh, Toán Cao Cấp..."
+                  placeholder={t('profile_favorite_subjects_placeholder')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2">Tiểu Sử / Câu Trích Dẫn Yêu Thích (Bio):</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_bio_label')}</label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={3}
                   maxLength={255}
-                  placeholder="Chia sẻ mục tiêu học tập hoặc phương châm cá nhân..."
+                  placeholder={t('profile_bio_placeholder')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 />
-                <span className="text-[10px] text-slate-400 float-right mt-1">{bio.length}/255 ký tự</span>
+                <span className="text-[10px] text-slate-400 float-right mt-1">{bio.length}/255 {t('profile_char_limit')}</span>
               </div>
 
               <div className="flex justify-end pt-4 border-t border-slate-800">
@@ -354,7 +360,7 @@ export default function Profile({ onBackToDashboard }) {
                   disabled={isLoading}
                   className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-indigo-600/25 transition-all cursor-pointer"
                 >
-                  {isLoading ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+                  {isLoading ? t('profile_saving') : t('profile_btn_save')}
                 </button>
               </div>
             </form>
@@ -366,21 +372,21 @@ export default function Profile({ onBackToDashboard }) {
           <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
             <h3 className="text-lg font-bold text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
               <Lock className="w-5 h-5 text-indigo-500" />
-              <span>Quản Lý Bảo Mật & Mật Khẩu</span>
+              <span>{t('profile_security_title')}</span>
             </h3>
 
             {user?.authProvider === 'GOOGLE' ? (
               <div className="bg-indigo-950/20 border border-indigo-500/30 rounded-2xl p-6 text-center space-y-3">
                 <Shield className="w-10 h-10 text-indigo-400 mx-auto" />
-                <h4 className="text-slate-100 font-bold text-base">Đăng Nhập Bằng Google</h4>
+                <h4 className="text-slate-100 font-bold text-base">{t('profile_google_title')}</h4>
                 <p className="text-slate-400 text-xs max-w-md mx-auto">
-                  Tài khoản này được liên kết và đăng nhập thông qua Google OAuth2. Mật khẩu của bạn được bảo mật tuyệt đối bởi Google.
+                  {t('profile_google_desc')}
                 </p>
               </div>
             ) : (
               <form onSubmit={handleChangePassword} className="space-y-4 max-w-lg">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Mật Khẩu Hiện Tại:</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_current_password')}</label>
                   <input
                     type="password"
                     value={currentPassword}
@@ -392,7 +398,7 @@ export default function Profile({ onBackToDashboard }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Mật Khẩu Mới (Tối thiểu 6 ký tự):</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_new_password')}</label>
                   <input
                     type="password"
                     value={newPassword}
@@ -405,7 +411,7 @@ export default function Profile({ onBackToDashboard }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Xác Nhận Mật Khẩu Mới:</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-2">{t('profile_confirm_password')}</label>
                   <input
                     type="password"
                     value={confirmPassword}
@@ -421,7 +427,7 @@ export default function Profile({ onBackToDashboard }) {
                   disabled={isLoading}
                   className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-lg transition-all cursor-pointer"
                 >
-                  {isLoading ? 'Đang xử lý...' : 'Đổi Mật Khẩu'}
+                  {isLoading ? t('profile_processing') : t('profile_btn_change_password')}
                 </button>
               </form>
             )}
@@ -434,10 +440,10 @@ export default function Profile({ onBackToDashboard }) {
             <div>
               <h3 className="text-lg font-bold text-slate-100 mb-1 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-indigo-500" />
-                <span>Danh Hiệu RPG Học Tập</span>
+                <span>{t('profile_titles_title')}</span>
               </h3>
               <p className="text-xs text-slate-400">
-                Tăng Level học tập của bạn để mở khóa các danh hiệu độc quyền và trang bị danh hiệu hiển thị công khai!
+                {t('profile_titles_desc')}
               </p>
             </div>
 
@@ -457,16 +463,16 @@ export default function Profile({ onBackToDashboard }) {
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-sm text-slate-100">{tItem.title}</span>
+                        <span className="font-bold text-sm text-slate-100">{t('title_' + tItem.title) || tItem.title}</span>
                         {tItem.unlocked ? (
                           <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
-                            <Check className="w-3.5 h-3.5" /> Đã Mở
+                            <Check className="w-3.5 h-3.5" /> {t('profile_title_unlocked')}
                           </span>
                         ) : (
-                          <span className="text-[11px] text-amber-400 font-medium">Cần Lvl {tItem.minLevelRequired}</span>
+                          <span className="text-[11px] text-amber-400 font-medium">{t('profile_title_req_lvl')} {tItem.minLevelRequired}</span>
                         )}
                       </div>
-                      <p className="text-slate-400 text-xs mb-4">{tItem.description}</p>
+                      <p className="text-slate-400 text-xs mb-4">{t('title_desc_' + tItem.title) || tItem.description}</p>
                     </div>
 
                     {tItem.unlocked && (
@@ -479,7 +485,7 @@ export default function Profile({ onBackToDashboard }) {
                             : 'bg-slate-800 hover:bg-indigo-600 text-slate-200 hover:text-white'
                         }`}
                       >
-                        {isSelected ? 'Đang Trang Bị' : 'Trang Bị Danh Hiệu'}
+                        {isSelected ? t('profile_title_equipped') : t('profile_title_equip_btn')}
                       </button>
                     )}
                   </div>
@@ -494,19 +500,36 @@ export default function Profile({ onBackToDashboard }) {
           <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
             <h3 className="text-lg font-bold text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
               <Settings className="w-5 h-5 text-indigo-500" />
-              <span>Cài Đặt Trải Nghiệm & Giao Diện</span>
+              <span>{t('profile_preferences_title')}</span>
             </h3>
 
             <div className="space-y-6">
+              {/* System Language Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-3">Tông Màu Nổi Bật (Theme Accent):</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-indigo-400" />
+                  <span>{t('profile_system_language_label')}</span>
+                </label>
+                <select
+                  value={preferredLanguage}
+                  onChange={(e) => setPreferredLanguage(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 text-slate-100 rounded-2xl px-4 py-3 text-sm font-semibold outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
+                >
+                  <option value="en">English (English)</option>
+                  <option value="vi">Tiếng Việt (Vietnamese)</option>
+                  <option value="zh">简体中文 (Chinese)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-3">{t('profile_theme_accent_label')}</label>
                 <div className="flex flex-wrap gap-4">
                   {[
-                    { id: 'indigo', name: 'Indigo (Mặc định)', bg: 'bg-indigo-600' },
-                    { id: 'emerald', name: 'Emerald Green', bg: 'bg-emerald-600' },
-                    { id: 'rose', name: 'Rose Red', bg: 'bg-rose-600' },
-                    { id: 'amber', name: 'Amber Gold', bg: 'bg-amber-600' },
-                    { id: 'purple', name: 'Royal Purple', bg: 'bg-purple-600' },
+                    { id: 'indigo', name: t('profile_accent_indigo'), bg: 'bg-indigo-600' },
+                    { id: 'emerald', name: t('profile_accent_emerald'), bg: 'bg-emerald-600' },
+                    { id: 'rose', name: t('profile_accent_rose'), bg: 'bg-rose-600' },
+                    { id: 'amber', name: t('profile_accent_amber'), bg: 'bg-amber-600' },
+                    { id: 'purple', name: t('profile_accent_purple'), bg: 'bg-purple-600' },
                   ].map((color) => (
                     <button
                       key={color.id}
@@ -527,8 +550,8 @@ export default function Profile({ onBackToDashboard }) {
 
               <div className="flex items-center justify-between p-4 bg-slate-950/80 border border-slate-800 rounded-2xl">
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-100">Hiệu Ứng Âm Thanh (Sound FX)</h4>
-                  <p className="text-xs text-slate-400">Phát âm thanh chúc mừng khi hoàn thành Pomodoro hoặc Level Up.</p>
+                  <h4 className="text-sm font-semibold text-slate-100">{t('profile_sound_fx_title')}</h4>
+                  <p className="text-xs text-slate-400">{t('profile_sound_fx_desc')}</p>
                 </div>
                 <button
                   type="button"
@@ -552,7 +575,7 @@ export default function Profile({ onBackToDashboard }) {
                   disabled={isLoading}
                   className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-xl transition-all cursor-pointer"
                 >
-                  {isLoading ? 'Đang lưu...' : 'Lưu Cài Đặt'}
+                  {isLoading ? t('profile_saving') : t('profile_btn_save_settings')}
                 </button>
               </div>
             </div>

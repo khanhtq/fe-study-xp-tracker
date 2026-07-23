@@ -1,30 +1,53 @@
 import React, { useState } from 'react';
 import { Upload, User, RefreshCw, X, Check } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
-// Cartoon & RPG Preset Avatars collection using SVG Data URIs / DiceBear collections
+const PRESET_NAMES = {
+  wizard: { en: "Wisdom Wizard", vi: "Pháp Sư Tri Thức", zh: "智慧法师" },
+  knight: { en: "Focus Knight", vi: "Hiệp Sĩ Tập Trung", zh: "专注骑士" },
+  owl: { en: "Night Owl Scholar", vi: "Cú Đêm Học Nốt", zh: "夜猫学霸" },
+  cat_gamer: { en: "Academic Cat", vi: "Mèo Học Thuật", zh: "学术猫" },
+  ninja: { en: "Pomodoro Ninja", vi: "Ninja Pomodoro", zh: "番茄忍者" },
+  fox_reader: { en: "Scholar Fox", vi: "Cáo Đọc Sách", zh: "学者狐" },
+  cyber_student: { en: "Cyber Student", vi: "Cyberpunk Scholar", zh: "赛博学生" },
+  astro_pup: { en: "Astro XP", vi: "Phi Hành Gia XP", zh: "XP 宇航员" },
+  dragon_master: { en: "Spirit Dragon Master", vi: "Chủ Nhân Linh Thú", zh: "灵兽驯养师" },
+  smart_bear: { en: "Wise Bear", vi: "Gấu Thông Thái", zh: "智慧熊" },
+  anime_sage: { en: "Anime Sage", vi: "Hiền Triết Anime", zh: "动漫贤者" },
+  pioneer: { en: "Study Pioneer", vi: "Tiên Phong Học Tập", zh: "学习先锋" },
+};
+
 const CARTOON_PRESETS = [
-  { id: 'wizard', name: 'Pháp Sư Tri Thức', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=WizardMind&backgroundColor=b6e3f4' },
-  { id: 'knight', name: 'Hiệp Sĩ Tập Trung', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=FocusKnight&backgroundColor=ffdfbf' },
-  { id: 'owl', name: 'Cú Đêm Học Nốt', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=NightOwlStudy&backgroundColor=c0aede' },
-  { id: 'cat_gamer', name: 'Mèo Học Thuật', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=GamerCat&backgroundColor=ffd5dc' },
-  { id: 'ninja', name: 'Ninja Pomodoro', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=PomoNinja&backgroundColor=d1d4f9' },
-  { id: 'fox_reader', name: 'Cáo Đọc Sách', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=FoxScholar&backgroundColor=b6e3f4' },
-  { id: 'cyber_student', name: 'Cyberpunk Scholar', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CyberStudent&backgroundColor=ffdfbf' },
-  { id: 'astro_pup', name: 'Phi Hành Gia XP', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=AstroXP&backgroundColor=c0aede' },
-  { id: 'dragon_master', name: 'Chủ Nhân Linh Thú', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=DragonScholar&backgroundColor=d1d4f9' },
-  { id: 'smart_bear', name: 'Gấu Thông Thái', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=SmartBear&backgroundColor=ffd5dc' },
-  { id: 'anime_sage', name: 'Hiền Triết Anime', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=AnimeSage&backgroundColor=b6e3f4' },
-  { id: 'pioneer', name: 'Tiên Phong Học Tập', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PioneerXP&backgroundColor=ffdfbf' },
+  { id: 'wizard', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=WizardMind&backgroundColor=b6e3f4' },
+  { id: 'knight', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=FocusKnight&backgroundColor=ffdfbf' },
+  { id: 'owl', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=NightOwlStudy&backgroundColor=c0aede' },
+  { id: 'cat_gamer', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=GamerCat&backgroundColor=ffd5dc' },
+  { id: 'ninja', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=PomoNinja&backgroundColor=d1d4f9' },
+  { id: 'fox_reader', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=FoxScholar&backgroundColor=b6e3f4' },
+  { id: 'cyber_student', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CyberStudent&backgroundColor=ffdfbf' },
+  { id: 'astro_pup', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=AstroXP&backgroundColor=c0aede' },
+  { id: 'dragon_master', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=DragonScholar&backgroundColor=d1d4f9' },
+  { id: 'smart_bear', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=SmartBear&backgroundColor=ffd5dc' },
+  { id: 'anime_sage', url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=AnimeSage&backgroundColor=b6e3f4' },
+  { id: 'pioneer', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PioneerXP&backgroundColor=ffdfbf' },
 ];
 
 const DICEBEAR_STYLES = [
-  { id: 'adventurer', name: 'Phi Phiêu Lưu (Adventurer)' },
-  { id: 'bottts', name: 'Robot Hoạt Hình (Bottts)' },
-  { id: 'lorelei', name: 'Anime / Manga (Lorelei)' },
-  { id: 'avataaars', name: 'Giao Diện Hiện Đại (Avataaars)' },
+  { id: 'adventurer' },
+  { id: 'bottts' },
+  { id: 'lorelei' },
+  { id: 'avataaars' },
 ];
 
+const DICEBEAR_NAMES = {
+  adventurer: { en: "Adventurer", vi: "Phiêu Lưu (Adventurer)", zh: "冒险家" },
+  bottts: { en: "Cartoon Robot (Bottts)", vi: "Robot Hoạt Hình (Bottts)", zh: "卡通机器人" },
+  lorelei: { en: "Anime / Manga (Lorelei)", vi: "Anime / Manga (Lorelei)", zh: "动漫 / 漫画" },
+  avataaars: { en: "Modern Avatars (Avataaars)", vi: "Giao Diện Hiện Đại (Avataaars)", zh: "现代头像" },
+};
+
 export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelectPreset, isLoading }) {
+  const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'preset' | 'dicebear'
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -163,7 +186,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                 setSelectedFile(null);
               }}
               className="absolute -top-1 -right-1 bg-rose-500 hover:bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md transition-all cursor-pointer"
-              title="Hủy chọn file"
+              title={t('avatar_cancel_tooltip')}
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -171,9 +194,9 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
         </div>
 
         <div className="flex-1 text-center md:text-left">
-          <h3 className="text-lg font-bold text-slate-100 mb-1">Ảnh Đại Diện</h3>
+          <h3 className="text-lg font-bold text-slate-100 mb-1">{t('avatar_title')}</h3>
           <p className="text-slate-400 text-sm mb-3">
-            Tải ảnh từ thiết bị của bạn hoặc chọn nhanh từ kho Avatar Hoạt Hình RPG.
+            {t('avatar_desc')}
           </p>
 
           {/* Navigation Tabs */}
@@ -187,7 +210,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                   : 'text-slate-400 hover:text-slate-100'
               }`}
             >
-              Tải Ảnh Lên
+              {t('avatar_tab_upload')}
             </button>
             <button
               type="button"
@@ -198,7 +221,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                   : 'text-slate-400 hover:text-slate-100'
               }`}
             >
-              Kho Avatar RPG
+              {t('avatar_tab_preset')}
             </button>
             <button
               type="button"
@@ -209,7 +232,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                   : 'text-slate-400 hover:text-slate-100'
               }`}
             >
-              Tạo Ngẫu Nhiên
+              {t('avatar_tab_generator')}
             </button>
           </div>
         </div>
@@ -239,10 +262,10 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
             <label htmlFor="avatar-file-input" className="cursor-pointer flex flex-col items-center justify-center">
               <Upload className="w-8 h-8 text-indigo-500 mb-2" />
               <p className="text-slate-100 text-sm font-semibold">
-                {selectedFile ? selectedFile.name : 'Kéo thả file vào đây hoặc bấm để tải lên'}
+                {selectedFile ? selectedFile.name : t('avatar_drag_drop')}
               </p>
               <p className="text-slate-400 text-xs mt-1">
-                Hỗ trợ PNG, JPG, WEBP (nén tự động dưới 5MB)
+                {t('avatar_support_formats')}
               </p>
             </label>
           </div>
@@ -257,7 +280,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                 }}
                 className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-slate-100 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all cursor-pointer"
               >
-                Hủy Chọn
+                {t('avatar_btn_cancel')}
               </button>
               <button
                 type="button"
@@ -265,7 +288,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                 disabled={isLoading}
                 className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
               >
-                {isLoading ? 'Đang lưu...' : 'Lưu Ảnh Đại Diện'}
+                {isLoading ? t('profile_saving') : t('avatar_btn_save')}
               </button>
             </div>
           )}
@@ -275,24 +298,27 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
       {/* Tab 2: Cartoon RPG Presets */}
       {activeTab === 'preset' && (
         <div className="space-y-4">
-          <p className="text-xs text-slate-400">Chọn 1 avatar hoạt hình phong cách RPG dưới đây:</p>
+          <p className="text-xs text-slate-400">{t('avatar_preset_subtitle')}</p>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {CARTOON_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                onClick={() => onSelectPreset(preset.url)}
-                disabled={isLoading}
-                className="group relative p-2 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/60 rounded-2xl transition-all flex flex-col items-center gap-1.5 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-              >
-                <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-950 p-0.5 border border-slate-800 group-hover:scale-105 transition-transform">
-                  <img src={preset.url} alt={preset.name} className="w-full h-full object-cover rounded-full" />
-                </div>
-                <span className="text-[11px] font-semibold text-slate-300 group-hover:text-indigo-400 line-clamp-1">
-                  {preset.name}
-                </span>
-              </button>
-            ))}
+            {CARTOON_PRESETS.map((preset) => {
+              const presetName = PRESET_NAMES[preset.id]?.[language] || PRESET_NAMES[preset.id]?.['en'] || preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => onSelectPreset(preset.url)}
+                  disabled={isLoading}
+                  className="group relative p-2 bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/60 rounded-2xl transition-all flex flex-col items-center gap-1.5 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                >
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-950 p-0.5 border border-slate-800 group-hover:scale-105 transition-transform">
+                    <img src={preset.url} alt={presetName} className="w-full h-full object-cover rounded-full" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-300 group-hover:text-indigo-400 line-clamp-1">
+                    {presetName}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -302,21 +328,24 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Phong Cách (Style):</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('avatar_gen_style')}</label>
               <select
                 value={diceStyle}
                 onChange={(e) => setDiceStyle(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               >
-                {DICEBEAR_STYLES.map((style) => (
-                  <option key={style.id} value={style.id}>
-                    {style.name}
-                  </option>
-                ))}
+                {DICEBEAR_STYLES.map((style) => {
+                  const styleName = DICEBEAR_NAMES[style.id]?.[language] || DICEBEAR_NAMES[style.id]?.['en'] || style.id;
+                  return (
+                    <option key={style.id} value={style.id}>
+                      {styleName}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Từ Khóa (Seed / Tên):</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('avatar_gen_seed')}</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -328,10 +357,10 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
                   type="button"
                   onClick={generateRandomSeed}
                   className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5"
-                  title="Tạo từ khóa ngẫu nhiên"
+                  title={t('avatar_gen_btn')}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Tạo Mới</span>
+                  <span>{t('avatar_gen_btn')}</span>
                 </button>
               </div>
             </div>
@@ -340,7 +369,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
           <div className="flex items-center justify-between p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800">
             <div className="flex items-center gap-3">
               <img src={diceBearUrl} alt="Generated Avatar" className="w-12 h-12 rounded-full bg-slate-950 border border-slate-800" />
-              <span className="text-xs text-slate-300 font-medium">Xem trước avatar tạo ra</span>
+              <span className="text-xs text-slate-300 font-medium">{t('avatar_gen_preview')}</span>
             </div>
             <button
               type="button"
@@ -348,7 +377,7 @@ export default function AvatarUploader({ currentAvatarUrl, onUploadFile, onSelec
               disabled={isLoading}
               className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg transition-all cursor-pointer"
             >
-              Chọn Avatar Này
+              {t('avatar_gen_use')}
             </button>
           </div>
         </div>

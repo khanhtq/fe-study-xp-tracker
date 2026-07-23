@@ -30,6 +30,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await userApi.getMe();
       setProgress(data);
+      if (data.preferredLanguage && (data.preferredLanguage === 'vi' || data.preferredLanguage === 'en' || data.preferredLanguage === 'zh')) {
+        const savedLang = localStorage.getItem('language');
+        if (savedLang !== data.preferredLanguage) {
+          localStorage.setItem('language', data.preferredLanguage);
+          window.dispatchEvent(new CustomEvent('language-change', { detail: data.preferredLanguage }));
+        }
+      }
       if (!isGuest) {
         setUser({
           id: data.userId,
@@ -42,6 +49,7 @@ export const AuthProvider = ({ children }) => {
           selectedTitle: data.selectedTitle,
           themeAccent: data.themeAccent,
           soundEnabled: data.soundEnabled,
+          preferredLanguage: data.preferredLanguage || 'en',
           authProvider: data.authProvider,
           role: data.role || 'ROLE_USER',
           currentLevel: data.currentLevel,
@@ -60,6 +68,7 @@ export const AuthProvider = ({ children }) => {
           selectedTitle: data.selectedTitle,
           themeAccent: data.themeAccent,
           soundEnabled: data.soundEnabled,
+          preferredLanguage: data.preferredLanguage || 'en',
           currentLevel: data.currentLevel,
           currentXp: data.currentXp,
           totalXp: data.totalXp,

@@ -82,7 +82,7 @@ export default function PublicProfileModal({ userId, onClose }) {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-indigo-400 gap-3">
               <Loader2 className="w-8 h-8 animate-spin" />
-              <span className="text-sm font-medium">Đang tải hồ sơ thành viên...</span>
+              <span className="text-sm font-medium">{t('loading_account')}</span>
             </div>
           ) : error ? (
             <div className="p-8 text-center">

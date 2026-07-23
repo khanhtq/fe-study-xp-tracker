@@ -292,7 +292,7 @@ export default function ForgotPassword({ onBackToLogin }) {
                 type="email"
                 required
                 className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
-                placeholder="ten@vi-du.com"
+                placeholder="your.email@example.com"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(''); }}
               />
