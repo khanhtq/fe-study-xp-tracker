@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import Footer from '../components/Footer';
 
 export default function Landing({ onNavigate }) {
   const { theme, toggleTheme } = useTheme();
@@ -603,15 +604,7 @@ export default function Landing({ onNavigate }) {
     </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 pt-10 mt-20 relative z-10 text-center text-slate-500 text-xs">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-indigo-500" />
-            <span className="font-semibold text-slate-400">Study XP Tracker</span>
-          </div>
-          <p>© 2026 Study XP Tracker. Gamified learning application.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

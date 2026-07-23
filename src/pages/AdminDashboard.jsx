@@ -6,6 +6,7 @@ import AdminOverviewCards from '../components/admin/AdminOverviewCards';
 import AdminOnlineTable from '../components/admin/AdminOnlineTable';
 import AdminUserStatsTable from '../components/admin/AdminUserStatsTable';
 import UserSessionDetailModal from '../components/admin/UserSessionDetailModal';
+import Footer from '../components/Footer';
 import { ShieldCheck, ArrowLeft, Radio, BarChart3, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -138,6 +139,8 @@ export default function AdminDashboard({ onBackToDashboard }) {
           onClose={() => setSelectedUserForModal(null)}
         />
       )}
+
+      <Footer />
     </div>
   );
 }

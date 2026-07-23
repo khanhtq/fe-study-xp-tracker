@@ -8,6 +8,7 @@ import StudyTimer from '../components/StudyTimer';
 import ManualSessionForm from '../components/ManualSessionForm';
 import SessionHistoryList from '../components/SessionHistoryList';
 import OnlineUsersList from '../components/OnlineUsersList';
+import Footer from '../components/Footer';
 import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -246,6 +247,8 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister }) {
           </div>
         </div>
       </main>
+
+      <Footer />
 
       {/* Session Result Toast */}
       <AnimatePresence>

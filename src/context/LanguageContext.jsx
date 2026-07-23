@@ -198,6 +198,13 @@ const translations = {
     guest_overlay_title: "Tạo tài khoản để lưu lịch sử học tập",
     guest_overlay_desc: "Bạn đang dùng tài khoản khách. Đăng ký ngay để mở khóa Thống kê 7 ngày, Heatmap và lưu giữ toàn bộ dữ liệu học tập!",
     guest_register_cta: "Đăng ký lưu dữ liệu",
+
+    // footer author info
+    footer_author_title: "Thông tin tác giả",
+    footer_author_name: "Tác giả",
+    footer_contact_email: "Email liên hệ",
+    footer_address: "Địa chỉ",
+    footer_copyright: "Ứng dụng gamification hỗ trợ theo dõi thời gian học tập, thăng cấp XP và duy trì thói quen học tập hiệu quả.",
   },
   en: {
     // auth / login / register
@@ -461,6 +468,13 @@ const translations = {
     guest_overlay_title: "Create an account to save study history",
     guest_overlay_desc: "You are currently in Guest mode. Register now to unlock 7-Day Stats, Heatmap, and save all your study progress!",
     guest_register_cta: "Register & Save Progress",
+
+    // footer author info
+    footer_author_title: "Author Information",
+    footer_author_name: "Author",
+    footer_contact_email: "Contact Email",
+    footer_address: "Address",
+    footer_copyright: "Gamified learning application to track study hours, level up XP, and build long-term study habits.",
   },
   zh: {
     // auth / login / register
@@ -644,6 +658,13 @@ const translations = {
     guest_overlay_title: "创建账户以保存学习记录",
     guest_overlay_desc: "您目前正在使用游客账户。立即注册账户以解锁7天统计、热力图并保存全部学习进度！",
     guest_register_cta: "注册并保存进度",
+
+    // footer author info
+    footer_author_title: "作者信息",
+    footer_author_name: "作者",
+    footer_contact_email: "联系邮箱",
+    footer_address: "地址",
+    footer_copyright: "游戏化学习应用，用于跟踪学习时间、提升 XP 等级并建立长期学习习惯。",
   }
 };
 
