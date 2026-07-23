@@ -306,13 +306,15 @@ const translations = {
     "title_Bậc Thầy Tập Trung": "Bậc Thầy Tập Trung",
     "title_Đại Sứ Học Thuật": "Đại Sứ Học Thuật",
     "title_Huyền Thoại XP": "Huyền Thoại XP",
+    "title_Thượng Cổ Thần Học": "Thượng Cổ Thần Học",
 
     "title_desc_Tân Binh Tập Trung": "Dành cho mọi thành viên mới bắt đầu hành trình học tập",
-    "title_desc_Học Giả Bền Bỉ": "Đạt Level 3 - Chứng tỏ tinh thần học tập kiên trì",
-    "title_desc_Chiến Binh Pomodoro": "Đạt Level 5 - Làm chủ kỹ năng quản lý thời gian",
-    "title_desc_Bậc Thầy Tập Trung": "Đạt Level 10 - Khả năng siêu tập trung không xao nhãng",
-    "title_desc_Đại Sứ Học Thuật": "Đạt Level 15 - Đỉnh cao tri thức và chuyên năng",
-    "title_desc_Huyền Thoại XP": "Đạt Level 25 - Huyền thoại trong giới cày XP học tập",
+    "title_desc_Học Giả Bền Bỉ": "Đạt Level 5 - Chứng tỏ tinh thần học tập kiên trì",
+    "title_desc_Chiến Binh Pomodoro": "Đạt Level 12 - Làm chủ kỹ năng quản lý thời gian",
+    "title_desc_Bậc Thầy Tập Trung": "Đạt Level 25 - Khả năng siêu tập trung không xao nhãng",
+    "title_desc_Đại Sứ Học Thuật": "Đạt Level 40 - Đỉnh cao tri thức và chuyên năng",
+    "title_desc_Huyền Thoại XP": "Đạt Level 60 - Huyền thoại trong giới cày XP học tập",
+    "title_desc_Thượng Cổ Thần Học": "Đạt Level 100 - Đỉnh phong chí tôn học giả",
   },
   en: {
     // auth / login / register
@@ -684,13 +686,15 @@ const translations = {
     "title_Bậc Thầy Tập Trung": "Focus Master",
     "title_Đại Sứ Học Thuật": "Academic Ambassador",
     "title_Huyền Thoại XP": "XP Legend",
+    "title_Thượng Cổ Thần Học": "Ancient Overlord",
 
     "title_desc_Tân Binh Tập Trung": "For all new members starting their study journey",
-    "title_desc_Học Giả Bền Bỉ": "Reach Level 3 - Demonstrate persistent study spirit",
-    "title_desc_Chiến Binh Pomodoro": "Reach Level 5 - Master time management skills",
-    "title_desc_Bậc Thầy Tập Trung": "Reach Level 10 - Super focus capability without distraction",
-    "title_desc_Đại Sứ Học Thuật": "Reach Level 15 - Pinnacle of knowledge and dedication",
-    "title_desc_Huyền Thoại XP": "Reach Level 25 - A true legend in XP study grinding",
+    "title_desc_Học Giả Bền Bỉ": "Reach Level 5 - Demonstrate persistent study spirit",
+    "title_desc_Chiến Binh Pomodoro": "Reach Level 12 - Master time management skills",
+    "title_desc_Bậc Thầy Tập Trung": "Reach Level 25 - Super focus capability without distraction",
+    "title_desc_Đại Sứ Học Thuật": "Reach Level 40 - Pinnacle of knowledge and dedication",
+    "title_desc_Huyền Thoại XP": "Reach Level 60 - A true legend in XP study grinding",
+    "title_desc_Thượng Cổ Thần Học": "Reach Level 100 - Ultimate supreme scholar milestone",
   },
   zh: {
     // auth / login / register
@@ -965,13 +969,15 @@ const translations = {
     "title_Bậc Thầy Tập Trung": "专注大师",
     "title_Đại Sứ Học Thuật": "学术大使",
     "title_Huyền Thoại XP": "XP 传奇",
+    "title_Thượng Cổ Thần Học": "远古学神",
 
     "title_desc_Tân Binh Tập Trung": "适合所有刚开始学习之旅的新成员",
-    "title_desc_Học Giả Bền Bỉ": "达到 3 级 - 展示坚持不懈的学习精神",
-    "title_desc_Chiến Binh Pomodoro": "达到 5 级 - 掌握时间管理技能",
-    "title_desc_Bậc Thầy Tập Trung": "达到 10 级 - 具备无干扰的高度专注能力",
-    "title_desc_Đại Sứ Học Thuật": "达到 15 级 - 知识与专注力的巅峰",
-    "title_desc_Huyền Thoại XP": "达到 25 级 - 学习经验值刷级界的传奇",
+    "title_desc_Học Giả Bền Bỉ": "达到 5 级 - 展示坚持不懈的学习精神",
+    "title_desc_Chiến Binh Pomodoro": "达到 12 级 - 掌握时间管理技能",
+    "title_desc_Bậc Thầy Tập Trung": "达到 25 级 - 具备无干扰的高度专注能力",
+    "title_desc_Đại Sứ Học Thuật": "达到 40 级 - 知识与专注力的巅峰",
+    "title_desc_Huyền Thoại XP": "达到 60 级 - 学习经验值刷级界的传奇",
+    "title_desc_Thượng Cổ Thần Học": "达到 100 级 - 独步天下的至尊学者",
   }
 };
 
