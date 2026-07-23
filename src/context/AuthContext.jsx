@@ -102,6 +102,29 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const loginWithGoogle = async (idToken) => {
+    localStorage.removeItem('isGuest');
+    localStorage.removeItem('guest_user');
+    
+    const res = await authApi.loginWithGoogle(idToken);
+
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify({
+      id: res.userId,
+      email: res.email,
+      displayName: res.displayName,
+      role: res.role || 'ROLE_USER',
+    }));
+    setToken(res.token);
+    setUser({
+      id: res.userId,
+      email: res.email,
+      displayName: res.displayName,
+      role: res.role || 'ROLE_USER',
+    });
+    return res;
+  };
+
   const loginAsGuest = async (displayName) => {
     const nameToUse = (displayName && displayName.trim()) ? displayName.trim() : 'Khách';
     const guestUser = {
@@ -301,6 +324,7 @@ export const AuthProvider = ({ children }) => {
       activeSession,
       loading,
       login,
+      loginWithGoogle,
       loginAsGuest,
       register,
       verifyOtp,

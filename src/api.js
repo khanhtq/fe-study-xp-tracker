@@ -230,6 +230,11 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
+  loginWithGoogle: (idToken) =>
+    apiCall('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    }),
 };
 
 export const userApi = {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,7 +7,7 @@ import { getErrorMessage } from '../api';
 import { ShieldAlert, UserPlus, LogIn, Flame, Sun, Moon } from 'lucide-react';
 
 export default function Register({ onToggleView, onBackToLanding, onNavigateVerifyOtp }) {
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [email, setEmail] = useState('');
@@ -203,6 +204,39 @@ export default function Register({ onToggleView, onBackToLanding, onNavigateVeri
               </>
             )}
           </button>
+
+          <div className="relative flex items-center justify-center my-3">
+            <div className="border-t border-slate-800 w-full" />
+            <span className="bg-slate-950 px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider absolute">
+              HOẶC
+            </span>
+          </div>
+
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  setLoading(true);
+                  setError('');
+                  try {
+                    await loginWithGoogle(credentialResponse.credential);
+                  } catch (err) {
+                    setError(getErrorMessage(err, 'register_failed', t));
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+              }}
+              onError={() => {
+                setError('Đăng nhập bằng Google thất bại. Vui lòng thử lại.');
+              }}
+              theme={theme === 'light' ? 'outline' : 'filled_black'}
+              shape="pill"
+              size="large"
+              text="signup_with"
+              locale="vi"
+            />
+          </div>
         </form>
 
         <div className="mt-6 pt-6 border-t border-slate-900/50 flex flex-col gap-3 text-center text-sm text-slate-400">

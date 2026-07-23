@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,7 +7,7 @@ import { getErrorMessage } from '../api';
 import { ShieldAlert, LogIn, UserPlus, Flame, Sun, Moon, UserCheck, User } from 'lucide-react';
 
 export default function Login({ onToggleView, onBackToLanding, onNavigateVerifyOtp, onNavigateForgotPassword }) {
-  const { login, loginAsGuest } = useAuth();
+  const { login, loginWithGoogle, loginAsGuest } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [authMode, setAuthMode] = useState('account'); // 'account' or 'guest'
@@ -212,6 +213,39 @@ export default function Login({ onToggleView, onBackToLanding, onNavigateVerifyO
                   </>
                 )}
               </button>
+
+              <div className="relative flex items-center justify-center my-3">
+                <div className="border-t border-slate-800 w-full" />
+                <span className="bg-slate-950 px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider absolute">
+                  HOẶC
+                </span>
+              </div>
+
+              <div className="flex justify-center w-full">
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    if (credentialResponse.credential) {
+                      setLoading(true);
+                      setError('');
+                      try {
+                        await loginWithGoogle(credentialResponse.credential);
+                      } catch (err) {
+                        setError(getErrorMessage(err, 'login_failed', t));
+                      } finally {
+                        setLoading(false);
+                      }
+                    }
+                  }}
+                  onError={() => {
+                    setError('Đăng nhập bằng Google thất bại. Vui lòng thử lại.');
+                  }}
+                  theme={theme === 'light' ? 'outline' : 'filled_black'}
+                  shape="pill"
+                  size="large"
+                  text="signin_with"
+                  locale="vi"
+                />
+              </div>
             </>
           ) : (
             <>
