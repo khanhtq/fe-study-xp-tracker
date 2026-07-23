@@ -182,7 +182,7 @@ function UserSearchResultCard({ user, onSelect }) {
           <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5 truncate">
             <span className="flex items-center gap-1 text-[11px] text-slate-400 truncate">
               <Shield className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              <span className="truncate">{user.selectedTitle || 'Tân Binh Tập Trung'}</span>
+              <span className="truncate">{t('title_' + (user.selectedTitle || 'Tân Binh Tập Trung')) || user.selectedTitle || 'Tân Binh Tập Trung'}</span>
             </span>
             {user.isStudying && (
               <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 shrink-0">

@@ -161,7 +161,7 @@ export default function PublicProfileModal({ userId, onClose }) {
                   </h3>
                   <div className="flex items-center gap-1.5 mt-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                     <Award className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                    <span>{profile.selectedTitle || 'Tân Binh Tập Trung'}</span>
+                    <span>{t('title_' + (profile.selectedTitle || 'Tân Binh Tập Trung')) || profile.selectedTitle || 'Tân Binh Tập Trung'}</span>
                   </div>
                 </div>
 

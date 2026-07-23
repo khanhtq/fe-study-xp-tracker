@@ -214,7 +214,7 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
               </span>
               {user?.selectedTitle && (
                 <span className="hidden md:inline-block text-[10px] font-medium text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
-                  {user.selectedTitle}
+                  {t('title_' + user.selectedTitle) || user.selectedTitle}
                 </span>
               )}
             </button>
