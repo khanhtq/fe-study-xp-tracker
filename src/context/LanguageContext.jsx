@@ -20,16 +20,28 @@ const translations = {
     register_btn: "Đăng ký",
     already_have_account: "Đã có tài khoản?",
     login_now: "Đăng nhập ngay",
-    passwords_dont_match: "Mật khẩu xác nhận không khớp.",
+    passwords_dont_match: "Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.",
     register_failed: "Đăng ký thất bại. Vui lòng thử lại.",
     login_failed: "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.",
     loading_account: "Đang tải tài khoản...",
+
+    // validation error messages
+    error_email_required: "Vui lòng nhập địa chỉ email.",
+    error_email_invalid: "Email không đúng định dạng. (ví dụ: ten@vi-du.com)",
+    error_password_required: "Vui lòng nhập mật khẩu.",
+    error_password_min_length: "Mật khẩu phải có ít nhất 6 ký tự.",
+    error_confirm_password_required: "Vui lòng xác nhận lại mật khẩu.",
+    error_confirm_password_mismatch: "Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại.",
+    error_display_name_required: "Vui lòng nhập tên hiển thị.",
+    error_display_name_length: "Tên hiển thị phải từ 2 đến 50 ký tự.",
+    error_otp_required: "Vui lòng nhập đầy đủ 4 chữ số mã OTP.",
+    error_otp_expired: "Mã OTP đã hết hạn (quá 5 phút). Vui lòng bấm 'Gửi lại mã' hoặc thực hiện đăng ký lại.",
 
     // friendly error messages (mapped from API error codes)
     error_invalid_credentials: "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.",
     error_account_not_found: "Không tìm thấy tài khoản với email này.",
     error_email_already_exists: "Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.",
-    error_invalid_input: "Thông tin không hợp lệ. Vui lòng kiểm tra lại các trường.",
+    error_invalid_input: "Thông tin nhập vào không hợp lệ. Vui lòng kiểm tra lại các trường.",
     error_session_already_active: "Bạn đang có một phiên học chưa kết thúc.",
     error_session_not_found: "Không tìm thấy phiên học này.",
     error_bad_request: "Yêu cầu không hợp lệ. Vui lòng kiểm tra lại thông tin.",
@@ -39,6 +51,7 @@ const translations = {
     error_too_many_requests: "Bạn đã thử quá nhiều lần. Vui lòng chờ một lúc rồi thử lại.",
     error_server: "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
     error_unknown: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+
 
     // dashboard layout & navbar
     logout: "Đăng xuất",

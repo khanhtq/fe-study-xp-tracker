@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getErrorMessage } from '../api';
 import { ShieldAlert, LogIn, UserPlus, Flame, Sun, Moon, UserCheck, User } from 'lucide-react';
 
-export default function Login({ onToggleView, onBackToLanding }) {
+export default function Login({ onToggleView, onBackToLanding, onNavigateVerifyOtp }) {
   const { login, loginAsGuest } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -15,22 +16,60 @@ export default function Login({ onToggleView, onBackToLanding }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validateForm = () => {
+    if (authMode === 'guest') {
+      const trimmedName = guestDisplayName.trim();
+      if (!trimmedName) {
+        setError(t('error_display_name_required'));
+        return false;
+      }
+      if (trimmedName.length < 2 || trimmedName.length > 50) {
+        setError(t('error_display_name_length'));
+        return false;
+      }
+      return true;
+    }
+
+    // Account mode validation
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError(t('error_email_required'));
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError(t('error_email_invalid'));
+      return false;
+    }
+
+    if (!password) {
+      setError(t('error_password_required'));
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     try {
       if (authMode === 'guest') {
-        await loginAsGuest(guestDisplayName);
+        await loginAsGuest(guestDisplayName.trim());
       } else {
-        await login(email, password);
+        const res = await login(email.trim(), password);
+        if (res?.requiresVerification && onNavigateVerifyOtp) {
+          onNavigateVerifyOtp(res.email || email.trim());
+        }
       }
     } catch (err) {
-      if (err.errorKey) {
-        setError(t(err.errorKey));
-      } else {
-        setError(err.message || t('login_failed'));
-      }
+      setError(getErrorMessage(err, 'login_failed', t));
     } finally {
       setLoading(false);
     }
@@ -117,7 +156,7 @@ export default function Login({ onToggleView, onBackToLanding }) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           {authMode === 'account' ? (
             <>
               <div>
@@ -130,7 +169,7 @@ export default function Login({ onToggleView, onBackToLanding }) {
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   placeholder="ten@vi-du.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
                 />
               </div>
 
@@ -144,7 +183,7 @@ export default function Login({ onToggleView, onBackToLanding }) {
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setError(''); }}
                 />
               </div>
 
@@ -175,7 +214,7 @@ export default function Login({ onToggleView, onBackToLanding }) {
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   placeholder={t('guest_name_placeholder')}
                   value={guestDisplayName}
-                  onChange={(e) => setGuestDisplayName(e.target.value)}
+                  onChange={(e) => { setGuestDisplayName(e.target.value); setError(''); }}
                 />
               </div>
 
@@ -210,7 +249,7 @@ export default function Login({ onToggleView, onBackToLanding }) {
           <div>
             <button
               onClick={onBackToLanding}
-              className="text-slate-500 hover:text-slate-350 font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
+              className="text-slate-500 hover:text-slate-300 font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
             >
               &larr; {t('landing_back_to_home')}
             </button>
@@ -220,4 +259,3 @@ export default function Login({ onToggleView, onBackToLanding }) {
     </div>
   );
 }
-

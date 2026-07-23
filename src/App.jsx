@@ -9,9 +9,12 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
+import VerifyOtp from './pages/VerifyOtp';
+
 function MainApp() {
   const { user, token, loading } = useAuth();
   const [view, setView] = useState('landing');
+  const [pendingVerifyEmail, setPendingVerifyEmail] = useState('');
   const { t } = useLanguage();
 
   if (loading) {
@@ -25,6 +28,16 @@ function MainApp() {
       </div>
     );
   }
+
+  const handleNavigateVerifyOtp = (email) => {
+    setPendingVerifyEmail(email);
+    setView('verify-otp');
+  };
+
+  const handleVerifySuccess = () => {
+    setView('dashboard');
+    setPendingVerifyEmail('');
+  };
 
   const activeView = token
     ? (view === 'admin' ? 'admin' : 'dashboard')
@@ -49,6 +62,7 @@ function MainApp() {
           <Register 
             onToggleView={() => setView('login')} 
             onBackToLanding={() => setView('dashboard')} 
+            onNavigateVerifyOtp={handleNavigateVerifyOtp}
           />
         ) : (
           <Dashboard 
@@ -57,15 +71,24 @@ function MainApp() {
           />
         )
       ) : (
-        view === 'login' ? (
+        view === 'verify-otp' ? (
+          <VerifyOtp 
+            email={pendingVerifyEmail} 
+            onBackToLogin={() => { setPendingVerifyEmail(''); setView('login'); }} 
+            onBackToRegister={() => { setPendingVerifyEmail(''); setView('register'); }} 
+            onSuccess={handleVerifySuccess}
+          />
+        ) : view === 'login' ? (
           <Login 
             onToggleView={() => setView('register')} 
             onBackToLanding={() => setView('landing')} 
+            onNavigateVerifyOtp={handleNavigateVerifyOtp}
           />
         ) : view === 'register' ? (
           <Register 
             onToggleView={() => setView('login')} 
             onBackToLanding={() => setView('landing')} 
+            onNavigateVerifyOtp={handleNavigateVerifyOtp}
           />
         ) : (
           <Landing onNavigate={setView} />

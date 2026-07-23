@@ -13,6 +13,36 @@ export class ApiError extends Error {
 }
 
 /**
+ * Helper to extract a user-facing error message from an error object.
+ * Gives precedence to explicit server/client error messages over generic translation keys.
+ *
+ * @param {Error|ApiError|object} err - The caught error
+ * @param {string} fallbackKey - Key in LanguageContext translations to use as fallback
+ * @param {Function} [t] - Translation function from LanguageContext
+ * @returns {string} - Clear error string for display
+ */
+export const getErrorMessage = (err, fallbackKey = 'error_unknown', t = (k) => k) => {
+  if (!err) return t ? t(fallbackKey) : fallbackKey;
+
+  if (typeof err === 'string') return err;
+
+  // If explicit message exists from backend or client validation
+  if (err.message && typeof err.message === 'string' && !err.message.startsWith('API error:')) {
+    return err.message;
+  }
+
+  // Fallback to errorKey translation if available
+  if (err.errorKey && t) {
+    const translated = t(err.errorKey);
+    if (translated && translated !== err.errorKey) {
+      return translated;
+    }
+  }
+
+  return t ? t(fallbackKey) : fallbackKey;
+};
+
+/**
  * Map an HTTP status code + endpoint context to a translation key.
  * Falls back to generic keys so every error has a human-readable message.
  *
@@ -23,13 +53,13 @@ export class ApiError extends Error {
 export const getErrorKey = (status, endpoint = '') => {
   // Auth-specific errors
   if (endpoint.includes('/auth/login')) {
-    if (status === 401 || status === 400 || status === 403) return 'error_invalid_credentials';
+    if (status === 401 || status === 403) return 'error_invalid_credentials';
     if (status === 404) return 'error_account_not_found';
     if (status === 429) return 'error_too_many_requests';
   }
   if (endpoint.includes('/auth/register')) {
-    if (status === 409 || status === 400) return 'error_email_already_exists';
-    if (status === 422) return 'error_invalid_input';
+    if (status === 409) return 'error_email_already_exists';
+    if (status === 422 || status === 400) return 'error_invalid_input';
     if (status === 429) return 'error_too_many_requests';
   }
   // Session errors
@@ -88,14 +118,14 @@ export const apiCall = async (endpoint, options = {}) => {
   }
 
   if (!response.ok) {
-    if ((response.status === 403 || response.status === 401) && !isGuestMode()) {
-      // Auto logout on token expiration (only for logged-in registered users)
+    if ((response.status === 403 || response.status === 401) && !isGuestMode() && !cleanEndpoint.startsWith('/auth/')) {
+      // Auto logout on token expiration (only for logged-in registered users, not hitting /auth/)
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.dispatchEvent(new Event('auth-expired'));
     }
     const errorData = await response.json().catch(() => ({}));
-    const errorKey = getErrorKey(response.status, endpoint);
+    const errorKey = getErrorKey(response.status, cleanEndpoint);
     throw new ApiError(
       errorData.message || `API error: ${response.status}`,
       response.status,
@@ -109,6 +139,7 @@ export const apiCall = async (endpoint, options = {}) => {
 
   return response.json();
 };
+
 
 const isGuestMode = () => localStorage.getItem('isGuest') === 'true';
 
@@ -168,6 +199,16 @@ export const authApi = {
     apiCall('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, password, displayName }),
+    }),
+  verifyOtp: (email, otp) =>
+    apiCall('/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    }),
+  resendOtp: (email) =>
+    apiCall('/auth/resend-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
     }),
   login: (email, password) => 
     apiCall('/auth/login', {

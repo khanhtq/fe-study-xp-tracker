@@ -80,6 +80,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('guest_user');
     
     const res = await authApi.login(email, password);
+
+    if (res.requiresVerification) {
+      return res;
+    }
+
     localStorage.setItem('token', res.token);
     localStorage.setItem('user', JSON.stringify({
       id: res.userId,
@@ -94,6 +99,7 @@ export const AuthProvider = ({ children }) => {
       displayName: res.displayName,
       role: res.role || 'ROLE_USER',
     });
+    return res;
   };
 
   const loginAsGuest = async (displayName) => {
@@ -148,51 +154,105 @@ export const AuthProvider = ({ children }) => {
 
     const res = await authApi.register(email, password, displayName);
 
-    // Save token
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('user', JSON.stringify({
-      id: res.userId,
-      email: res.email,
-      displayName: res.displayName,
-      role: res.role || 'ROLE_USER',
-    }));
-
-    // Clear guest state
-    localStorage.removeItem('isGuest');
-    localStorage.removeItem('guest_user');
-    localStorage.removeItem('guest_progress');
-    localStorage.removeItem('guest_active_session');
-    localStorage.removeItem('guest_sessions');
-
-    setActiveSessionState(null);
-
-    // Sync guest sessions to backend if any existed
-    if (guestSessions.length > 0) {
-      // Sort oldest to newest to preserve order
-      const sorted = [...guestSessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
-      for (const s of sorted) {
-        try {
-          await apiCall('/study-sessions/manual', {
-            method: 'POST',
-            body: JSON.stringify({
-              subject: s.subject || '',
-              durationSeconds: s.durationSeconds,
-              startedAt: s.startedAt,
-            }),
-          });
-        } catch (err) {
-          console.warn('Failed to migrate guest session:', err);
-        }
+    if (res.requiresVerification) {
+      // Store pending guest sessions if any for migration post-OTP verification
+      if (guestSessions.length > 0) {
+        localStorage.setItem('pending_guest_sessions', JSON.stringify(guestSessions));
       }
+      return res;
     }
 
-    setToken(res.token);
-    setUser({
-      id: res.userId,
-      email: res.email,
-      displayName: res.displayName,
-      role: res.role || 'ROLE_USER',
-    });
+    // Save token if verified immediately
+    if (res.token) {
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify({
+        id: res.userId,
+        email: res.email,
+        displayName: res.displayName,
+        role: res.role || 'ROLE_USER',
+      }));
+
+      // Clear guest state
+      localStorage.removeItem('isGuest');
+      localStorage.removeItem('guest_user');
+      localStorage.removeItem('guest_progress');
+      localStorage.removeItem('guest_active_session');
+      localStorage.removeItem('guest_sessions');
+
+      setActiveSessionState(null);
+
+      setToken(res.token);
+      setUser({
+        id: res.userId,
+        email: res.email,
+        displayName: res.displayName,
+        role: res.role || 'ROLE_USER',
+      });
+    }
+
+    return res;
+  };
+
+  const verifyOtp = async (email, otp) => {
+    const res = await authApi.verifyOtp(email, otp);
+    
+    if (res.token) {
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify({
+        id: res.userId,
+        email: res.email,
+        displayName: res.displayName,
+        role: res.role || 'ROLE_USER',
+      }));
+
+      // Sync guest sessions if pending
+      const pendingGuestStr = localStorage.getItem('pending_guest_sessions');
+      if (pendingGuestStr) {
+        try {
+          const guestSessions = JSON.parse(pendingGuestStr);
+          if (guestSessions.length > 0) {
+            const sorted = [...guestSessions].sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+            for (const s of sorted) {
+              try {
+                await apiCall('/study-sessions/manual', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    subject: s.subject || '',
+                    durationSeconds: s.durationSeconds,
+                    startedAt: s.startedAt,
+                  }),
+                });
+              } catch (err) {
+                console.warn('Failed to migrate guest session:', err);
+              }
+            }
+          }
+        } catch (e) {}
+        localStorage.removeItem('pending_guest_sessions');
+      }
+
+      // Clear guest state
+      localStorage.removeItem('isGuest');
+      localStorage.removeItem('guest_user');
+      localStorage.removeItem('guest_progress');
+      localStorage.removeItem('guest_active_session');
+      localStorage.removeItem('guest_sessions');
+
+      setActiveSessionState(null);
+      setToken(res.token);
+      setUser({
+        id: res.userId,
+        email: res.email,
+        displayName: res.displayName,
+        role: res.role || 'ROLE_USER',
+      });
+    }
+
+    return res;
+  };
+
+  const resendOtp = async (email) => {
+    return await authApi.resendOtp(email);
   };
 
   const logout = async () => {
@@ -210,6 +270,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('guest_sessions');
     localStorage.removeItem('guest_active_session');
     localStorage.removeItem('guest_progress');
+    localStorage.removeItem('pending_guest_sessions');
     setToken(null);
     setUser(null);
     setProgress(null);
@@ -230,6 +291,8 @@ export const AuthProvider = ({ children }) => {
       login,
       loginAsGuest,
       register,
+      verifyOtp,
+      resendOtp,
       logout,
       refreshProgress,
       setActiveSession: updateActiveSession
