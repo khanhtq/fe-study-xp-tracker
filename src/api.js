@@ -88,8 +88,8 @@ export const apiCall = async (endpoint, options = {}) => {
   }
 
   if (!response.ok) {
-    if (response.status === 403) {
-      // Auto logout on token expiration
+    if ((response.status === 403 || response.status === 401) && !isGuestMode()) {
+      // Auto logout on token expiration (only for logged-in registered users)
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.dispatchEvent(new Event('auth-expired'));
@@ -110,6 +110,59 @@ export const apiCall = async (endpoint, options = {}) => {
   return response.json();
 };
 
+const isGuestMode = () => localStorage.getItem('isGuest') === 'true';
+
+const getGuestProgress = () => {
+  const saved = localStorage.getItem('guest_progress');
+  if (saved) {
+    try { return JSON.parse(saved); } catch (e) {}
+  }
+  const guestUserStr = localStorage.getItem('guest_user');
+  let displayName = 'Khách';
+  if (guestUserStr) {
+    try { displayName = JSON.parse(guestUserStr).displayName || displayName; } catch(e) {}
+  }
+  return {
+    userId: 'guest',
+    displayName,
+    currentLevel: 1,
+    currentXp: 0,
+    totalXp: 0,
+    xpRequiredForNextLevel: 100,
+    isGuest: true
+  };
+};
+
+const updateGuestProgressWithXp = (xpEarned) => {
+  const progress = getGuestProgress();
+  let totalXp = progress.totalXp + xpEarned;
+  let currentXp = progress.currentXp + xpEarned;
+  let currentLevel = progress.currentLevel;
+
+  const getXpRequiredForNextLevel = (level) => Math.round(100 * Math.pow(level, 1.5));
+
+  while (true) {
+    const xpReq = getXpRequiredForNextLevel(currentLevel);
+    if (currentXp >= xpReq) {
+      currentXp -= xpReq;
+      currentLevel++;
+    } else {
+      break;
+    }
+  }
+
+  const updatedProgress = {
+    ...progress,
+    currentLevel,
+    currentXp,
+    totalXp,
+    xpRequiredForNextLevel: getXpRequiredForNextLevel(currentLevel)
+  };
+
+  localStorage.setItem('guest_progress', JSON.stringify(updatedProgress));
+  return updatedProgress;
+};
+
 export const authApi = {
   register: (email, password, displayName) => 
     apiCall('/auth/register', {
@@ -124,31 +177,125 @@ export const authApi = {
 };
 
 export const userApi = {
-  getMe: () => apiCall('/users/me'),
-  getOnline: () => apiCall('/users/online'),
+  getMe: () => {
+    if (isGuestMode()) {
+      return Promise.resolve(getGuestProgress());
+    }
+    return apiCall('/users/me');
+  },
+  getOnline: () => {
+    if (isGuestMode()) {
+      return apiCall('/users/online').catch(() => []);
+    }
+    return apiCall('/users/online');
+  },
 };
 
 export const sessionApi = {
-  start: (subject) => 
-    apiCall('/study-sessions/start', {
+  start: (subject) => {
+    if (isGuestMode()) {
+      const session = {
+        id: 'guest-session-' + Date.now(),
+        subject: subject || '',
+        startedAt: new Date().toISOString(),
+        source: 'TIMER'
+      };
+      localStorage.setItem('guest_active_session', JSON.stringify(session));
+      return Promise.resolve(session);
+    }
+    return apiCall('/study-sessions/start', {
       method: 'POST',
       body: JSON.stringify({ subject }),
-    }),
-  stop: (id) => 
-    apiCall(`/study-sessions/${id}/stop`, {
+    });
+  },
+  stop: (id) => {
+    if (isGuestMode()) {
+      const activeStr = localStorage.getItem('guest_active_session');
+      const active = activeStr ? JSON.parse(activeStr) : {};
+      const start = active.startedAt ? new Date(active.startedAt).getTime() : Date.now();
+      const now = Date.now();
+      const durationSeconds = Math.max(0, Math.floor((now - start) / 1000));
+      const minutes = durationSeconds / 60;
+      const baseXp = minutes * 10;
+      const xpEarned = durationSeconds >= 1500 ? Math.round(baseXp * 1.1) : Math.round(baseXp);
+
+      const finishedSession = {
+        id: active.id || ('guest-session-' + Date.now()),
+        subject: active.subject || '',
+        startedAt: active.startedAt || new Date().toISOString(),
+        endedAt: new Date().toISOString(),
+        durationSeconds,
+        xpEarned,
+        source: 'TIMER'
+      };
+
+      const historyStr = localStorage.getItem('guest_sessions');
+      const history = historyStr ? JSON.parse(historyStr) : [];
+      history.unshift(finishedSession);
+      localStorage.setItem('guest_sessions', JSON.stringify(history));
+      localStorage.removeItem('guest_active_session');
+
+      updateGuestProgressWithXp(xpEarned);
+
+      return Promise.resolve(finishedSession);
+    }
+    return apiCall(`/study-sessions/${id}/stop`, {
       method: 'POST',
-    }),
-  createManual: (subject, durationSeconds, startedAt) => 
-    apiCall('/study-sessions/manual', {
+    });
+  },
+  createManual: (subject, durationSeconds, startedAt) => {
+    if (isGuestMode()) {
+      const durationSecs = parseInt(durationSeconds, 10);
+      const minutes = durationSecs / 60;
+      const baseXp = minutes * 10;
+      const xpEarned = durationSecs >= 1500 ? Math.round(baseXp * 1.1) : Math.round(baseXp);
+
+      const finishedSession = {
+        id: 'guest-session-' + Date.now(),
+        subject: subject || '',
+        startedAt: startedAt || new Date().toISOString(),
+        endedAt: new Date().toISOString(),
+        durationSeconds: durationSecs,
+        xpEarned,
+        source: 'MANUAL'
+      };
+
+      const historyStr = localStorage.getItem('guest_sessions');
+      const history = historyStr ? JSON.parse(historyStr) : [];
+      history.unshift(finishedSession);
+      localStorage.setItem('guest_sessions', JSON.stringify(history));
+
+      updateGuestProgressWithXp(xpEarned);
+
+      return Promise.resolve(finishedSession);
+    }
+    return apiCall('/study-sessions/manual', {
       method: 'POST',
       body: JSON.stringify({ subject, durationSeconds, startedAt }),
-    }),
-  getActive: () => apiCall('/study-sessions/active'),
-  getHistory: () => apiCall('/study-sessions'),
-  sendHeartbeat: (id) => 
-    apiCall(`/study-sessions/${id}/heartbeat`, {
+    });
+  },
+  getActive: () => {
+    if (isGuestMode()) {
+      const activeStr = localStorage.getItem('guest_active_session');
+      return Promise.resolve(activeStr ? JSON.parse(activeStr) : null);
+    }
+    return apiCall('/study-sessions/active');
+  },
+  getHistory: () => {
+    if (isGuestMode()) {
+      const historyStr = localStorage.getItem('guest_sessions');
+      return Promise.resolve(historyStr ? JSON.parse(historyStr) : []);
+    }
+    return apiCall('/study-sessions');
+  },
+  sendHeartbeat: (id) => {
+    if (isGuestMode()) {
+      return Promise.resolve();
+    }
+    return apiCall(`/study-sessions/${id}/heartbeat`, {
       method: 'POST',
-    }),
+    });
+  },
 };
 
 export const adminApi = {

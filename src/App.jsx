@@ -26,12 +26,37 @@ function MainApp() {
     );
   }
 
-  const activeView = token ? (view === 'admin' ? 'admin' : 'dashboard') : view;
+  const activeView = token
+    ? (view === 'admin' ? 'admin' : 'dashboard')
+    : (user?.isGuest
+        ? (view === 'register' ? 'register' : 'dashboard')
+        : view);
 
   return (
     <>
       <SEO view={activeView} />
-      {!token ? (
+      {token ? (
+        view === 'admin' && user?.role === 'ROLE_ADMIN' ? (
+          <AdminDashboard onBackToDashboard={() => setView('dashboard')} />
+        ) : (
+          <Dashboard 
+            onNavigateAdmin={() => setView('admin')} 
+            onNavigateRegister={() => setView('register')}
+          />
+        )
+      ) : user?.isGuest ? (
+        view === 'register' ? (
+          <Register 
+            onToggleView={() => setView('login')} 
+            onBackToLanding={() => setView('dashboard')} 
+          />
+        ) : (
+          <Dashboard 
+            onNavigateAdmin={() => setView('admin')} 
+            onNavigateRegister={() => setView('register')}
+          />
+        )
+      ) : (
         view === 'login' ? (
           <Login 
             onToggleView={() => setView('register')} 
@@ -45,10 +70,6 @@ function MainApp() {
         ) : (
           <Landing onNavigate={setView} />
         )
-      ) : view === 'admin' && user?.role === 'ROLE_ADMIN' ? (
-        <AdminDashboard onBackToDashboard={() => setView('dashboard')} />
-      ) : (
-        <Dashboard onNavigateAdmin={() => setView('admin')} />
       )}
     </>
   );

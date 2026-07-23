@@ -20,7 +20,7 @@ const calculateXpEarned = (durationSeconds) => {
   return Math.round(baseXp);
 };
 
-export default function Dashboard({ onNavigateAdmin }) {
+export default function Dashboard({ onNavigateAdmin, onNavigateRegister }) {
   const { user, progress, logout, refreshProgress, activeSession } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -117,9 +117,6 @@ export default function Dashboard({ onNavigateAdmin }) {
       setSessionToast(null);
     }, 5000);
 
-    // If manual logging causes level up, user progress in AuthContext gets updated.
-    // However, if we want to check if they leveled up from manual session, we can compare
-    // current level in AuthContext before and after. For simplicity, just refresh progress.
     refreshProgress();
   }, [fetchHistory, refreshProgress, t]);
 
@@ -151,6 +148,20 @@ export default function Dashboard({ onNavigateAdmin }) {
                 <ShieldCheck className="w-4 h-4 text-amber-400" />
                 <span>Admin</span>
               </button>
+            )}
+
+            {user?.isGuest && (
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                  {t('guest_badge')}
+                </span>
+                <button
+                  onClick={onNavigateRegister}
+                  className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
+                >
+                  <span>{t('guest_register_cta')}</span>
+                </button>
+              </div>
             )}
 
             <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-1.5 text-sm">
@@ -226,7 +237,11 @@ export default function Dashboard({ onNavigateAdmin }) {
                 <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
               </div>
             ) : (
-              <SessionHistoryList sessions={sessions} />
+              <SessionHistoryList 
+                sessions={sessions} 
+                isGuest={user?.isGuest} 
+                onNavigateRegister={onNavigateRegister} 
+              />
             )}
           </div>
         </div>

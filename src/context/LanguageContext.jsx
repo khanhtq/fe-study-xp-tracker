@@ -174,6 +174,17 @@ const translations = {
     landing_mock_coop_title: "Đang Học Cùng Bạn",
     landing_mock_user1_subject: "Đang học Toán Giải Tích",
     landing_mock_user2_subject: "Đang học Lập Trình Java",
+
+    // guest mode
+    guest_login: "Đăng nhập Khách",
+    guest_login_btn: "Vào học ngay",
+    guest_login_subtitle: "Chỉ cần nhập tên hiển thị để trải nghiệm ngay hệ thống!",
+    guest_name_label: "Tên hiển thị của bạn",
+    guest_name_placeholder: "Ví dụ: Khách Cần Mẫn...",
+    guest_badge: "Tài khoản Khách",
+    guest_overlay_title: "Tạo tài khoản để lưu lịch sử học tập",
+    guest_overlay_desc: "Bạn đang dùng tài khoản khách. Đăng ký ngay để mở khóa Thống kê 7 ngày, Heatmap và lưu giữ toàn bộ dữ liệu học tập!",
+    guest_register_cta: "Đăng ký lưu dữ liệu",
   },
   en: {
     // auth / login / register
@@ -426,6 +437,17 @@ const translations = {
     admin_session_source_manual: "Manual Mode",
     admin_role_admin: "Administrator",
     admin_role_user: "Learner",
+
+    // guest mode
+    guest_login: "Guest Login",
+    guest_login_btn: "Enter as Guest",
+    guest_login_subtitle: "Enter a display name to try out the app instantly!",
+    guest_name_label: "Your Display Name",
+    guest_name_placeholder: "e.g., Diligent Guest...",
+    guest_badge: "Guest Account",
+    guest_overlay_title: "Create an account to save study history",
+    guest_overlay_desc: "You are currently in Guest mode. Register now to unlock 7-Day Stats, Heatmap, and save all your study progress!",
+    guest_register_cta: "Register & Save Progress",
   },
   zh: {
     // auth / login / register
@@ -598,6 +620,17 @@ const translations = {
     landing_mock_coop_title: "正在和你一同学习",
     landing_mock_user1_subject: "正在学习微积分",
     landing_mock_user2_subject: "正在学习 Java 编程",
+
+    // guest mode
+    guest_login: "游客登录",
+    guest_login_btn: "以游客身份进入",
+    guest_login_subtitle: "只需输入显示名称即可立即体验！",
+    guest_name_label: "您的显示名称",
+    guest_name_placeholder: "例如: 勤奋的游客...",
+    guest_badge: "游客账户",
+    guest_overlay_title: "创建账户以保存学习记录",
+    guest_overlay_desc: "您目前正在使用游客账户。立即注册账户以解锁7天统计、热力图并保存全部学习进度！",
+    guest_register_cta: "注册并保存进度",
   }
 };
 

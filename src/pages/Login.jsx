@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { ShieldAlert, LogIn, UserPlus, Flame, Sun, Moon } from 'lucide-react';
+import { ShieldAlert, LogIn, UserPlus, Flame, Sun, Moon, UserCheck, User } from 'lucide-react';
 
 export default function Login({ onToggleView, onBackToLanding }) {
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const [authMode, setAuthMode] = useState('account'); // 'account' or 'guest'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [guestDisplayName, setGuestDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,9 +20,12 @@ export default function Login({ onToggleView, onBackToLanding }) {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      if (authMode === 'guest') {
+        await loginAsGuest(guestDisplayName);
+      } else {
+        await login(email, password);
+      }
     } catch (err) {
-      // Use the i18n error key if available (from ApiError), otherwise fall back
       if (err.errorKey) {
         setError(t(err.errorKey));
       } else {
@@ -64,7 +69,7 @@ export default function Login({ onToggleView, onBackToLanding }) {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
 
       <div className="w-full max-w-md glass-panel glass-panel-glow rounded-3xl p-8 z-10 relative">
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-6">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 animate-bounce-slow">
             <Flame className="w-8 h-8 text-white fill-white/20" />
           </div>
@@ -72,8 +77,37 @@ export default function Login({ onToggleView, onBackToLanding }) {
             {t('login_title')}
           </h2>
           <p className="text-slate-400 mt-2 text-sm text-center">
-            {t('login_subtitle')}
+            {authMode === 'guest' ? t('guest_login_subtitle') : t('login_subtitle')}
           </p>
+        </div>
+
+        {/* Mode Selector Switch */}
+        <div className="flex bg-slate-900/80 border border-slate-800 p-1 rounded-2xl mb-6">
+          <button
+            type="button"
+            onClick={() => { setAuthMode('account'); setError(''); }}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+              authMode === 'account'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            <span>{t('login_btn')}</span>
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => { setAuthMode('guest'); setError(''); }}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+              authMode === 'guest'
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <UserCheck className="w-4 h-4 text-emerald-400" />
+            <span>{t('guest_login')}</span>
+          </button>
         </div>
 
         {error && (
@@ -84,48 +118,83 @@ export default function Login({ onToggleView, onBackToLanding }) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              {t('email')}
-            </label>
-            <input
-              type="email"
-              required
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-              placeholder="ten@vi-du.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          {authMode === 'account' ? (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  {t('email')}
+                </label>
+                <input
+                  type="email"
+                  required
+                  className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                  placeholder="ten@vi-du.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              {t('password')}
-            </label>
-            <input
-              type="password"
-              required
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  {t('password')}
+                </label>
+                <input
+                  type="password"
+                  required
+                  className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>{t('login_btn')}</span>
-                <LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 cursor-pointer"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>{t('login_btn')}</span>
+                    <LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  {t('guest_name_label')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                  placeholder={t('guest_name_placeholder')}
+                  value={guestDisplayName}
+                  onChange={(e) => setGuestDisplayName(e.target.value)}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 cursor-pointer"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>{t('guest_login_btn')}</span>
+                    <UserCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </form>
 
         <div className="mt-6 pt-6 border-t border-slate-900/50 flex flex-col gap-3 text-center text-sm text-slate-400">
@@ -151,3 +220,4 @@ export default function Login({ onToggleView, onBackToLanding }) {
     </div>
   );
 }
+
