@@ -49,7 +49,7 @@ export default function UserSearchModal({ isOpen, onClose, onSelectUser }) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -59,14 +59,14 @@ export default function UserSearchModal({ isOpen, onClose, onSelectUser }) {
         >
           {/* Search Header */}
           <div className="p-4 border-b border-slate-800/80 flex items-center gap-3 bg-slate-900/60">
-            <Search className="w-5 h-5 text-indigo-400 shrink-0" />
+            <Search className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('search_members_placeholder')}
-              className="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm focus:outline-none font-medium"
+              className="w-full bg-transparent text-slate-100 placeholder-slate-400 text-sm focus:outline-none font-medium"
             />
             {query && (
               <button
@@ -87,17 +87,17 @@ export default function UserSearchModal({ isOpen, onClose, onSelectUser }) {
           {/* Results Area */}
           <div className="p-4 overflow-y-auto flex-1 scrollbar-thin space-y-2">
             {loading ? (
-              <div className="flex items-center justify-center py-12 text-indigo-400 gap-2 text-sm font-medium">
+              <div className="flex items-center justify-center py-12 text-indigo-600 dark:text-indigo-400 gap-2 text-sm font-medium">
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span>Đang tìm kiếm thành viên...</span>
               </div>
             ) : query.trim() && results.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 text-sm font-medium">
+              <div className="text-center py-12 text-slate-400 text-sm font-medium">
                 {t('no_members_found')}
               </div>
             ) : !query.trim() ? (
-              <div className="text-center py-12 text-slate-500 text-sm font-medium flex flex-col items-center gap-2">
-                <UserCheck className="w-8 h-8 text-slate-600 mb-1" />
+              <div className="text-center py-12 text-slate-400 text-sm font-medium flex flex-col items-center gap-2">
+                <UserCheck className="w-8 h-8 text-slate-400 mb-1" />
                 <span>{t('search_members_placeholder')}</span>
               </div>
             ) : (
@@ -171,21 +171,21 @@ function UserSearchResultCard({ user, onSelect }) {
 
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-100 group-hover:text-indigo-300 transition-colors text-sm truncate">
+            <span className="font-semibold text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors text-sm truncate">
               {user.displayName}
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-extrabold text-[10px] shrink-0">
+            <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 font-extrabold text-[10px] shrink-0">
               {t('level_short')} {user.currentLevel || 1}
             </span>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5 truncate">
-            <span className="flex items-center gap-1 text-[11px] text-slate-500 truncate">
-              <Shield className="w-3 h-3 text-indigo-400/80 shrink-0" />
+            <span className="flex items-center gap-1 text-[11px] text-slate-400 truncate">
+              <Shield className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">{user.selectedTitle || 'Tân Binh Tập Trung'}</span>
             </span>
             {user.isStudying && (
-              <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 shrink-0">
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 shrink-0">
                 <BookOpen className="w-3 h-3" />
                 <span>{t('member_status_studying')}</span>
               </span>
@@ -194,7 +194,7 @@ function UserSearchResultCard({ user, onSelect }) {
         </div>
       </div>
 
-      <button className="px-3 py-1.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold group-hover:bg-indigo-600 group-hover:text-white transition-all shrink-0">
+      <button className="px-3 py-1.5 rounded-xl bg-indigo-500/10 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 text-xs font-semibold group-hover:bg-indigo-600 group-hover:text-white transition-all shrink-0 cursor-pointer">
         {t('view_profile')}
       </button>
     </div>
