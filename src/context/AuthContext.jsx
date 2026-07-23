@@ -35,12 +35,29 @@ export const AuthProvider = ({ children }) => {
           id: data.userId,
           email: data.email,
           displayName: data.displayName,
+          avatarUrl: data.avatarUrl,
+          bio: data.bio,
+          dailyGoalMinutes: data.dailyGoalMinutes,
+          favoriteSubjects: data.favoriteSubjects,
+          selectedTitle: data.selectedTitle,
+          themeAccent: data.themeAccent,
+          soundEnabled: data.soundEnabled,
+          authProvider: data.authProvider,
           role: data.role || 'ROLE_USER',
         });
       } else {
         const guestUserStr = localStorage.getItem('guest_user');
         const guestUser = guestUserStr ? JSON.parse(guestUserStr) : { id: 'guest', displayName: 'Khách', role: 'ROLE_GUEST', isGuest: true };
-        setUser(guestUser);
+        setUser({
+          ...guestUser,
+          avatarUrl: data.avatarUrl,
+          bio: data.bio,
+          dailyGoalMinutes: data.dailyGoalMinutes,
+          favoriteSubjects: data.favoriteSubjects,
+          selectedTitle: data.selectedTitle,
+          themeAccent: data.themeAccent,
+          soundEnabled: data.soundEnabled,
+        });
       }
     } catch (err) {
       console.error('Error fetching progress:', err);
@@ -334,6 +351,7 @@ export const AuthProvider = ({ children }) => {
       resetPassword,
       logout,
       refreshProgress,
+      refreshUserProgress: refreshProgress,
       setActiveSession: updateActiveSession
     }}>
       {children}

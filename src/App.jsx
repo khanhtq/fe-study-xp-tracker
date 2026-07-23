@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
 
 import VerifyOtp from './pages/VerifyOtp';
 import ForgotPassword from './pages/ForgotPassword';
@@ -52,10 +53,13 @@ function MainApp() {
       {token ? (
         view === 'admin' && user?.role === 'ROLE_ADMIN' ? (
           <AdminDashboard onBackToDashboard={() => setView('dashboard')} />
+        ) : view === 'profile' ? (
+          <Profile onBackToDashboard={() => setView('dashboard')} />
         ) : (
           <Dashboard 
             onNavigateAdmin={() => setView('admin')} 
             onNavigateRegister={() => setView('register')}
+            onNavigateProfile={() => setView('profile')}
           />
         )
       ) : user?.isGuest ? (
@@ -65,10 +69,13 @@ function MainApp() {
             onBackToLanding={() => setView('dashboard')} 
             onNavigateVerifyOtp={handleNavigateVerifyOtp}
           />
+        ) : view === 'profile' ? (
+          <Profile onBackToDashboard={() => setView('dashboard')} />
         ) : (
           <Dashboard 
             onNavigateAdmin={() => setView('admin')} 
             onNavigateRegister={() => setView('register')}
+            onNavigateProfile={() => setView('profile')}
           />
         )
       ) : (

@@ -21,7 +21,7 @@ const calculateXpEarned = (durationSeconds) => {
   return Math.round(baseXp);
 };
 
-export default function Dashboard({ onNavigateAdmin, onNavigateRegister }) {
+export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavigateProfile }) {
   const { user, progress, logout, refreshProgress, activeSession } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -165,10 +165,33 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister }) {
               </div>
             )}
 
-            <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl px-4 py-1.5 text-sm">
-              <User className="w-4 h-4 text-slate-500" />
-              <span className="text-slate-300 font-semibold">{user?.displayName}</span>
-            </div>
+            <button
+              onClick={onNavigateProfile}
+              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-sm transition-all cursor-pointer shadow-md"
+              title="Quản lý trang cá nhân & Cài đặt"
+            >
+              <div className="w-6 h-6 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center text-xs text-white font-bold">
+                {user?.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl.startsWith('http') ? user.avatarUrl : `http://localhost:8080${user.avatarUrl}`}
+                    alt="Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.displayName || 'User'}`;
+                    }}
+                  />
+                ) : (
+                  <span>👤</span>
+                )}
+              </div>
+              <span className="text-slate-200 font-semibold text-xs sm:text-sm">{user?.displayName}</span>
+              {user?.selectedTitle && (
+                <span className="hidden md:inline-block text-[10px] font-medium text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                  {user.selectedTitle}
+                </span>
+              )}
+            </button>
 
             {/* Language Selector Dropdown */}
             <select

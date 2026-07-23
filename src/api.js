@@ -97,6 +97,9 @@ export const apiCall = async (endpoint, options = {}) => {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${cleanBaseUrl}${cleanEndpoint}`;
   const headers = { ...getHeaders(), ...options.headers };
+  if (options.body instanceof FormData) {
+    delete headers['Content-Type'];
+  }
   
   const response = await fetch(url, {
     ...options,
@@ -243,6 +246,60 @@ export const userApi = {
       return Promise.resolve(getGuestProgress());
     }
     return apiCall('/users/me');
+  },
+  updateProfile: (profileData) => {
+    if (isGuestMode()) {
+      const current = getGuestProgress();
+      const updated = { ...current, ...profileData };
+      localStorage.setItem('guest_progress', JSON.stringify(updated));
+      return Promise.resolve(updated);
+    }
+    return apiCall('/users/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  },
+  uploadAvatar: (file) => {
+    if (isGuestMode()) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const avatarUrl = reader.result;
+          const current = getGuestProgress();
+          const updated = { ...current, avatarUrl };
+          localStorage.setItem('guest_progress', JSON.stringify(updated));
+          resolve(updated);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiCall('/users/avatar', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+  changePassword: (currentPassword, newPassword, confirmPassword) => {
+    if (isGuestMode()) {
+      return Promise.reject(new ApiError('Tài khoản Khách không thể thay đổi mật khẩu.', 400));
+    }
+    return apiCall('/users/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+    });
+  },
+  getAvailableTitles: () => {
+    if (isGuestMode()) {
+      const current = getGuestProgress();
+      const level = current.currentLevel || 1;
+      return Promise.resolve([
+        { title: 'Tân Binh Tập Trung', description: 'Dành cho mọi thành viên mới bắt đầu hành trình học tập', minLevelRequired: 1, unlocked: true },
+        { title: 'Học Giả Bền Bỉ', description: 'Đạt Level 3 - Tinh thần kiên trì', minLevelRequired: 3, unlocked: level >= 3 },
+        { title: 'Chiến Binh Pomodoro', description: 'Đạt Level 5 - Làm chủ kỹ năng quản lý thời gian', minLevelRequired: 5, unlocked: level >= 5 },
+      ]);
+    }
+    return apiCall('/users/titles');
   },
   getOnline: () => {
     if (isGuestMode()) {
