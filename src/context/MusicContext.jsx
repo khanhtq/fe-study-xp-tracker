@@ -201,9 +201,15 @@ export const MusicProvider = ({ children }) => {
     const handleWindowMessage = (event) => {
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        if (data?.event === 'infoDelivery' && data?.info?.playerState === 0) {
+        const playerState = data?.info?.playerState ?? data?.info ?? data?.data;
+        const isEnded =
+          (data?.event === 'onStateChange' && playerState === 0) ||
+          (data?.event === 'infoDelivery' && playerState === 0) ||
+          playerState === 0;
+
+        if (isEnded) {
           const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
-          if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
+          if (!hasTriggeredEndRef.current && elapsedSinceStart > 4000) {
             hasTriggeredEndRef.current = true;
             console.log('YouTube iframe ENDED (playerState: 0), auto-nexting');
             handleAutoNextRef.current?.();
@@ -218,14 +224,24 @@ export const MusicProvider = ({ children }) => {
     return () => window.removeEventListener('message', handleWindowMessage);
   }, []);
 
-  // UI Clock Timer for YouTube Embed Fallback mode
+  // UI Clock Timer for YouTube Embed Fallback mode & end trigger
   useEffect(() => {
     if (!useEmbedFallback || !isPlaying) return undefined;
 
     const intervalId = window.setInterval(() => {
       setCurrentTime((time) => {
         const nextTime = time + 0.25;
-        return duration > 0 ? Math.min(nextTime, duration) : nextTime;
+        const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
+        if (duration > 0 && nextTime >= duration) {
+          window.clearInterval(intervalId);
+          if (!hasTriggeredEndRef.current && elapsedSinceStart > 4000) {
+            hasTriggeredEndRef.current = true;
+            console.log('Embed timer reached end of track duration, auto-nexting');
+            handleAutoNextRef.current?.();
+          }
+          return duration;
+        }
+        return nextTime;
       });
     }, 250);
 
@@ -239,13 +255,27 @@ export const MusicProvider = ({ children }) => {
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
+
+      // Chuyển bài tự động khi audio chạy gần sát điểm kết thúc (chỉ áp dụng sau khi bài đã phát > 10s)
+      const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
+      if (
+        !hasTriggeredEndRef.current &&
+        audio.currentTime > 10 &&
+        audio.duration > 0 &&
+        audio.currentTime >= audio.duration - 0.8 &&
+        elapsedSinceStart > 4000
+      ) {
+        hasTriggeredEndRef.current = true;
+        console.log('HTML5 Audio reached end of track duration, auto-nexting');
+        handleAutoNextRef.current?.();
+      }
     };
 
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
 
     const handleEnded = () => {
       const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
-      if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
+      if (!hasTriggeredEndRef.current && elapsedSinceStart > 4000) {
         hasTriggeredEndRef.current = true;
         console.log('HTML5 Audio ended event naturally fired, auto-nexting');
         handleAutoNextRef.current?.();
