@@ -162,10 +162,10 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
             <button
               onClick={() => setIsChatOpen(true)}
               className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/50 rounded-2xl px-3 py-1.5 text-slate-100 hover:text-purple-600 dark:hover:text-purple-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-md"
-              title="Cửa sổ nhắn tin"
+              title={t('nav_messages_title')}
             >
               <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span className="hidden sm:inline">Tin nhắn</span>
+              <span className="hidden sm:inline">{t('nav_messages')}</span>
               {progress?.unreadMessagesCount > 0 && (
                 <span className="px-1.5 py-0.5 text-[10px] bg-rose-500 text-white font-extrabold rounded-full animate-pulse">
                   {progress.unreadMessagesCount}
@@ -176,10 +176,10 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
             <button
               onClick={() => setIsFriendsOpen(true)}
               className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-md"
-              title="Danh sách Bạn bè"
+              title={t('nav_friends_title')}
             >
               <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden sm:inline">Bạn bè</span>
+              <span className="hidden sm:inline">{t('nav_friends')}</span>
               {progress?.pendingFriendRequestsCount > 0 && (
                 <span className="px-1.5 py-0.5 text-[10px] bg-rose-500 text-white font-extrabold rounded-full animate-pulse">
                   {progress.pendingFriendRequestsCount}

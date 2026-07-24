@@ -58,6 +58,10 @@ const translations = {
     theme_light: "Chế độ sáng",
     theme_dark: "Chế độ tối",
     language: "Ngôn ngữ",
+    nav_messages: "Tin nhắn",
+    nav_messages_title: "Cửa sổ nhắn tin",
+    nav_friends: "Bạn bè",
+    nav_friends_title: "Danh sách bạn bè",
 
     // xp bar
     level: "Cấp",
@@ -430,6 +434,10 @@ const translations = {
     theme_light: "Light Mode",
     theme_dark: "Dark Mode",
     language: "Language",
+    nav_messages: "Messages",
+    nav_messages_title: "Messages Chat Window",
+    nav_friends: "Friends",
+    nav_friends_title: "Friends List",
 
     // xp bar
     level: "Lvl",
@@ -882,6 +890,10 @@ const translations = {
     theme_light: "浅色模式",
     theme_dark: "深色模式",
     language: "语言",
+    nav_messages: "消息",
+    nav_messages_title: "消息聊天窗口",
+    nav_friends: "好友",
+    nav_friends_title: "好友列表",
 
     // xp bar
     level: "等级",
