@@ -118,7 +118,19 @@ export const MusicProvider = ({ children }) => {
 
   playTrackRef.current = playTrack;
 
-  // Auto Next Logic: Random track from same topic, excluding current track
+  // Helper kiểm tra bài hát khác cả về ID lẫn Tên bài (Title)
+  const isDifferentTrack = (candidate, activeTrack) => {
+    if (!activeTrack || !candidate) return true;
+    if (candidate.id === activeTrack.id) return false;
+    if (candidate.title && activeTrack.title) {
+      const titleA = candidate.title.trim().toLowerCase();
+      const titleB = activeTrack.title.trim().toLowerCase();
+      if (titleA === titleB) return false;
+    }
+    return true;
+  };
+
+  // Auto Next Logic: Random track from same topic, excluding current track by ID and Title
   const handleAutoNext = useCallback(() => {
     const activeTrack = currentTrackRef.current;
     const activePlaylist = playlistRef.current;
@@ -128,9 +140,7 @@ export const MusicProvider = ({ children }) => {
 
     // 1. Same topic candidates from activePlaylist
     if (activePlaylist && activePlaylist.length > 0) {
-      candidateTracks = activePlaylist.filter(
-        (t) => !activeTrack || t.id !== activeTrack.id
-      );
+      candidateTracks = activePlaylist.filter((t) => isDifferentTrack(t, activeTrack));
     }
 
     // 2. If single track or no candidate, find matching category in preset playlists
@@ -140,16 +150,14 @@ export const MusicProvider = ({ children }) => {
       ) || allPlaylists[0];
 
       if (matchingPlaylist && matchingPlaylist.tracks) {
-        candidateTracks = matchingPlaylist.tracks.filter(
-          (t) => !activeTrack || t.id !== activeTrack.id
-        );
+        candidateTracks = matchingPlaylist.tracks.filter((t) => isDifferentTrack(t, activeTrack));
       }
     }
 
     // 3. Fallback to any preset track
     if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
       const allTracks = allPlaylists.flatMap((pl) => pl.tracks || []);
-      candidateTracks = allTracks.filter((t) => !activeTrack || t.id !== activeTrack.id);
+      candidateTracks = allTracks.filter((t) => isDifferentTrack(t, activeTrack));
     }
 
     if (candidateTracks.length === 0) return;
