@@ -144,14 +144,21 @@ const translations = {
     no_online_short: "No one online",
 
     // session history
-    history_title: "Study History",
-    no_sessions: "No sessions logged yet.",
-    delete_confirm: "Delete this session?",
-    source_timer: "Timer",
-    source_manual: "Manual",
-    chart_minutes_label: "Minutes",
-    chart_title: "Last 7 Days",
-    no_sessions_subtitle: "Start the timer or log a session to earn XP!",
+    history_title: "Lịch Sử Học Tập",
+    no_sessions: "Chưa có buổi học nào được ghi nhận.",
+    delete_confirm: "Xóa buổi học này?",
+    source_timer: "Bấm giờ",
+    source_manual: "Nhập tay",
+    chart_minutes_label: "Số phút",
+    chart_title: "Thống Kê 7 Ngày Qua",
+    no_sessions_subtitle: "Hãy bật đồng hồ hoặc ghi nhận buổi học để tích lũy XP!",
+    filter_all: "Tất cả",
+    filter_today: "Hôm nay",
+    filter_7d: "7 ngày qua",
+    filter_30d: "30 ngày qua",
+    filter_custom: "Chọn ngày",
+    filter_title: "Lọc theo thời gian:",
+    no_filtered_sessions: "Không tìm thấy buổi học nào trong khoảng thời gian này.",
 
     // study calendar
     calendar_title: "Study Calendar",
@@ -531,6 +538,13 @@ const translations = {
     chart_minutes_label: "Minutes studied",
     chart_title: "Last 7 Days Statistics",
     no_sessions_subtitle: "Start the timer or add goals to begin grinding XP!",
+    filter_all: "All",
+    filter_today: "Today",
+    filter_7d: "Last 7 days",
+    filter_30d: "Last 30 days",
+    filter_custom: "Pick a date",
+    filter_title: "Filter by time:",
+    no_filtered_sessions: "No sessions found for the selected time filter.",
 
     // study calendar
     calendar_title: "Study Calendar",

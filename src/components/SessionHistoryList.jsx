@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { History, Calendar, Clock, Sparkles, TrendingUp, Lock, UserPlus } from 'lucide-react';
+import React, { memo, useState, useMemo } from 'react';
+import { History, Calendar, Clock, Sparkles, TrendingUp, Lock, UserPlus, Filter } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -17,6 +17,43 @@ const METHOD_CONFIG = {
 function SessionHistoryList({ sessions, isGuest, onNavigateRegister }) {
   const { theme } = useTheme();
   const { language, t } = useLanguage();
+
+  const [filterType, setFilterType] = useState('ALL');
+  const [customDate, setCustomDate] = useState('');
+
+  const filteredSessions = useMemo(() => {
+    if (!sessions || sessions.length === 0) return [];
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+    return sessions.filter(session => {
+      if (!session.startedAt) return true;
+      const sessionDate = new Date(session.startedAt);
+      const sessionTime = sessionDate.getTime();
+
+      if (filterType === 'TODAY') {
+        return sessionTime >= startOfToday;
+      }
+      if (filterType === 'LAST_7D') {
+        const sevenDaysAgo = startOfToday - (6 * 24 * 60 * 60 * 1000);
+        return sessionTime >= sevenDaysAgo;
+      }
+      if (filterType === 'LAST_30D') {
+        const thirtyDaysAgo = startOfToday - (29 * 24 * 60 * 60 * 1000);
+        return sessionTime >= thirtyDaysAgo;
+      }
+      if (filterType === 'CUSTOM' && customDate) {
+        const [year, month, day] = customDate.split('-').map(Number);
+        return (
+          sessionDate.getFullYear() === year &&
+          (sessionDate.getMonth() + 1) === month &&
+          sessionDate.getDate() === day
+        );
+      }
+      return true;
+    });
+  }, [sessions, filterType, customDate]);
   
   const formatDuration = (secs) => {
     if (!secs) return '0s';
@@ -160,14 +197,83 @@ function SessionHistoryList({ sessions, isGuest, onNavigateRegister }) {
         )}
       </div>
 
-      {/* History List Panel */}
+      {/* History List Panel with Filter Bar */}
       <div className="w-full glass-panel rounded-3xl p-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
         
-        <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 mb-6">
-          <History className="w-5 h-5 text-purple-400" />
-          {t('history_title')}
-        </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+            <History className="w-5 h-5 text-purple-400" />
+            {t('history_title')}
+          </h3>
+
+          {/* Date Filter Controls */}
+          {sessions.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 flex items-center gap-1 font-medium mr-1">
+                <Filter className="w-3.5 h-3.5 text-indigo-400" />
+                {t('filter_title')}
+              </span>
+              
+              <button
+                onClick={() => { setFilterType('ALL'); setCustomDate(''); }}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                  filterType === 'ALL'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {t('filter_all')}
+              </button>
+
+              <button
+                onClick={() => { setFilterType('TODAY'); setCustomDate(''); }}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                  filterType === 'TODAY'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {t('filter_today')}
+              </button>
+
+              <button
+                onClick={() => { setFilterType('LAST_7D'); setCustomDate(''); }}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                  filterType === 'LAST_7D'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {t('filter_7d')}
+              </button>
+
+              <button
+                onClick={() => { setFilterType('LAST_30D'); setCustomDate(''); }}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                  filterType === 'LAST_30D'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {t('filter_30d')}
+              </button>
+
+              {/* Custom Date Picker */}
+              <input
+                type="date"
+                value={customDate}
+                onChange={(e) => {
+                  setCustomDate(e.target.value);
+                  if (e.target.value) setFilterType('CUSTOM');
+                }}
+                className={`bg-slate-900/60 border rounded-xl px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition-all ${
+                  filterType === 'CUSTOM' ? 'border-indigo-500 text-indigo-300 font-bold' : 'border-slate-800'
+                }`}
+              />
+            </div>
+          )}
+        </div>
 
         {sessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -177,9 +283,22 @@ function SessionHistoryList({ sessions, isGuest, onNavigateRegister }) {
             <p className="text-slate-500 font-medium">{t('no_sessions')}</p>
             <p className="text-xs text-slate-600 mt-1">{t('no_sessions_subtitle')}</p>
           </div>
+        ) : filteredSessions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
+              <Filter className="w-6 h-6 text-slate-500" />
+            </div>
+            <p className="text-slate-400 font-medium">{t('no_filtered_sessions')}</p>
+            <button
+              onClick={() => { setFilterType('ALL'); setCustomDate(''); }}
+              className="mt-3 text-xs text-indigo-400 hover:text-indigo-300 font-bold underline"
+            >
+              {t('filter_all')}
+            </button>
+          </div>
         ) : (
           <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">
-            {sessions.map((session) => (
+            {filteredSessions.map((session) => (
               <div
                 key={session.id}
                 className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 hover:border-slate-700/50 transition-colors"
