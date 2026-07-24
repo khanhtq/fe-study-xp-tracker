@@ -140,7 +140,16 @@ export const apiCall = async (endpoint, options = {}) => {
     return null;
   }
 
-  return response.json();
+  const text = await response.text();
+  if (!text || !text.trim()) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text;
+  }
 };
 
 
@@ -434,4 +443,39 @@ export const adminApi = {
   getOnlineUsersDetailed: () => apiCall('/admin/users/online'),
   getUserStatsList: (range = 'all') => apiCall(`/admin/users/stats?range=${range}`),
   getUserSessions: (userId) => apiCall(`/admin/users/${userId}/sessions`),
+};
+
+export const friendsApi = {
+  getFriends: () => {
+    if (isGuestMode()) return Promise.resolve([]);
+    return apiCall('/friends');
+  },
+  getPendingRequestsReceived: () => {
+    if (isGuestMode()) return Promise.resolve([]);
+    return apiCall('/friends/requests/received');
+  },
+  getPendingRequestsSent: () => {
+    if (isGuestMode()) return Promise.resolve([]);
+    return apiCall('/friends/requests/sent');
+  },
+  sendRequest: (userId) => {
+    if (isGuestMode()) return Promise.reject(new Error('Chức năng yêu cầu đăng nhập'));
+    return apiCall(`/friends/request/${userId}`, { method: 'POST' });
+  },
+  acceptRequest: (friendshipId) => {
+    if (isGuestMode()) return Promise.reject(new Error('Chức năng yêu cầu đăng nhập'));
+    return apiCall(`/friends/accept/${friendshipId}`, { method: 'PUT' });
+  },
+  declineRequest: (friendshipId) => {
+    if (isGuestMode()) return Promise.reject(new Error('Chức năng yêu cầu đăng nhập'));
+    return apiCall(`/friends/decline/${friendshipId}`, { method: 'PUT' });
+  },
+  unfriend: (friendId) => {
+    if (isGuestMode()) return Promise.reject(new Error('Chức năng yêu cầu đăng nhập'));
+    return apiCall(`/friends/${friendId}`, { method: 'DELETE' });
+  },
+  getStatus: (userId) => {
+    if (isGuestMode()) return Promise.resolve({ status: 'NONE' });
+    return apiCall(`/friends/status/${userId}`);
+  },
 };

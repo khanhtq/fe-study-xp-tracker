@@ -30,6 +30,7 @@ export default function Profile({ onBackToDashboard }) {
   const [themeAccent, setThemeAccent] = useState('indigo');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [preferredLanguage, setPreferredLanguage] = useState('en');
+  const [activityStatusVisibility, setActivityStatusVisibility] = useState('EVERYONE');
   const [availableTitles, setAvailableTitles] = useState([]);
 
   // UI status
@@ -47,8 +48,9 @@ export default function Profile({ onBackToDashboard }) {
       setThemeAccent(user.themeAccent || 'indigo');
       setSoundEnabled(user.soundEnabled !== undefined ? user.soundEnabled : true);
       setPreferredLanguage(user.preferredLanguage || language || 'en');
+      setActivityStatusVisibility(user.activityStatusVisibility || progress?.activityStatusVisibility || 'EVERYONE');
     }
-  }, [user, language]);
+  }, [user, progress, language]);
 
   useEffect(() => {
     userApi
@@ -72,6 +74,7 @@ export default function Profile({ onBackToDashboard }) {
         themeAccent,
         soundEnabled,
         preferredLanguage,
+        activityStatusVisibility,
       });
       if (preferredLanguage && preferredLanguage !== language) {
         setLanguage(preferredLanguage);
@@ -566,6 +569,45 @@ export default function Profile({ onBackToDashboard }) {
                     }`}
                   />
                 </button>
+              </div>
+
+              {/* Activity Status Privacy Setting */}
+              <div className="pt-4 border-t border-slate-800">
+                <label className="block text-xs font-semibold text-slate-300 mb-2">
+                  <span>{t('profile_privacy_status_title')}</span>
+                </label>
+                <p className="text-xs text-slate-400 mb-3">
+                  {t('profile_privacy_status_desc')}
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { id: 'EVERYONE', title: t('profile_privacy_everyone_title'), desc: t('profile_privacy_everyone_desc') },
+                    { id: 'FRIENDS_ONLY', title: t('profile_privacy_friends_title'), desc: t('profile_privacy_friends_desc') },
+                    { id: 'NOBODY', title: t('profile_privacy_nobody_title'), desc: t('profile_privacy_nobody_desc') },
+                  ].map((opt) => (
+                    <label
+                      key={opt.id}
+                      className={`flex items-start gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                        activityStatusVisibility === opt.id
+                          ? 'bg-slate-800/90 border-indigo-500 ring-2 ring-indigo-500/30'
+                          : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="activityStatusVisibility"
+                        value={opt.id}
+                        checked={activityStatusVisibility === opt.id}
+                        onChange={(e) => setActivityStatusVisibility(e.target.value)}
+                        className="mt-1 accent-indigo-500 cursor-pointer"
+                      />
+                      <div>
+                        <span className="text-xs font-bold text-slate-100 block">{opt.title}</span>
+                        <span className="text-[11px] text-slate-400">{opt.desc}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="flex justify-end pt-4 border-t border-slate-800">

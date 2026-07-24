@@ -10,8 +10,9 @@ import SessionHistoryList from '../components/SessionHistoryList';
 import OnlineUsersList from '../components/OnlineUsersList';
 import UserSearchModal from '../components/UserSearchModal';
 import PublicProfileModal from '../components/PublicProfileModal';
+import FriendsModal from '../components/FriendsModal';
 import Footer from '../components/Footer';
-import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck, Search } from 'lucide-react';
+import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck, Search, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const calculateXpEarned = (durationSeconds) => {
@@ -43,6 +44,7 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
   const [liveXpProgress, setLiveXpProgress] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isFriendsOpen, setIsFriendsOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   const fetchHistory = useCallback(async () => {
@@ -155,12 +157,17 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-slate-300 hover:text-white text-xs sm:text-sm transition-all cursor-pointer shadow-md"
-              title={t('search_members')}
+              onClick={() => setIsFriendsOpen(true)}
+              className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-slate-300 hover:text-white text-xs sm:text-sm transition-all cursor-pointer shadow-md"
+              title="Danh sách Bạn bè"
             >
-              <Search className="w-4 h-4 text-indigo-400" />
-              <span className="hidden md:inline font-semibold">{t('search_members')}</span>
+              <Users className="w-4 h-4 text-indigo-400" />
+              <span className="hidden sm:inline font-semibold">Bạn bè</span>
+              {progress?.pendingFriendRequestsCount > 0 && (
+                <span className="px-1.5 py-0.5 text-[10px] bg-rose-500 text-white font-extrabold rounded-full animate-pulse">
+                  {progress.pendingFriendRequestsCount}
+                </span>
+              )}
             </button>
 
             {user?.role === 'ROLE_ADMIN' && (
@@ -313,6 +320,14 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
       <PublicProfileModal 
         userId={selectedUserId} 
         onClose={() => setSelectedUserId(null)} 
+      />
+
+      {/* Friends Management Modal */}
+      <FriendsModal
+        isOpen={isFriendsOpen}
+        onClose={() => setIsFriendsOpen(false)}
+        onViewProfile={(userId) => setSelectedUserId(userId)}
+        onRefreshUserProgress={refreshProgress}
       />
 
       {/* Session Result Toast */}
