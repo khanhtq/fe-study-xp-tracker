@@ -214,14 +214,6 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
                 )}
               </div>
               <span className="text-slate-200 font-semibold text-xs sm:text-sm">{user?.displayName}</span>
-              <span className="px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-extrabold text-[10px]">
-                {t('level_short')} {progress?.currentLevel ?? user?.currentLevel ?? 1}
-              </span>
-              {user?.selectedTitle && (
-                <span className="hidden md:inline-block text-[10px] font-medium text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
-                  {t('title_' + user.selectedTitle) || user.selectedTitle}
-                </span>
-              )}
             </button>
           </div>
         </div>
