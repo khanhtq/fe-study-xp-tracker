@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { messageApi, friendsApi, getErrorMessage } from '../api';
 import { useAuth } from '../context/AuthContext';
+import { useMusic } from '../context/MusicContext';
 import { subscribeToMessages } from '../websocket';
 import {
   MessageSquare, X, Send, Search, Smile, ShieldAlert, UserPlus, CheckCheck,
@@ -12,6 +13,7 @@ const PRESET_EMOJIS = ['😊', '👍', '🔥', '📚', '💪', '✨', '❤️', 
 
 export default function ChatModal({ isOpen, onClose, activeTargetUser = null, onSelectProfile = null }) {
   const { user, refreshProgress } = useAuth();
+  const { isMinimized: isMusicMinimized } = useMusic() || { isMinimized: true };
   const [conversations, setConversations] = useState([]);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -23,7 +25,6 @@ export default function ChatModal({ isOpen, onClose, activeTargetUser = null, on
   const [sending, setSending] = useState(false);
   const [restrictionNotice, setRestrictionNotice] = useState(null);
   const [canSend, setCanSend] = useState(true);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [unreadTotal, setUnreadTotal] = useState(0);
 
   const messagesEndRef = useRef(null);
@@ -210,36 +211,19 @@ export default function ChatModal({ isOpen, onClose, activeTargetUser = null, on
   );
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 font-sans">
-      <AnimatePresence>
-        {isMinimized ? (
-          // Minimized Floating Widget
-          <motion.button
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            onClick={() => setIsMinimized(false)}
-            className="flex items-center gap-3 px-5 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xl hover:brightness-110 transition-all border border-indigo-400/40 cursor-pointer relative group"
-          >
-            <MessageSquare className="w-5 h-5 animate-pulse" />
-            <span className="text-sm font-bold">
-              {selectedPartner ? selectedPartner.partnerDisplayName : 'Tin nhắn'}
-            </span>
-            {unreadTotal > 0 && (
-              <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[11px] font-black flex items-center justify-center border-2 border-slate-900 shadow-md">
-                {unreadTotal}
-              </span>
-            )}
-          </motion.button>
-        ) : (
-          // Main Chat Drawer Panel
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="w-[92vw] sm:w-[420px] md:w-[680px] h-[560px] bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl flex overflow-hidden relative"
-          >
+    <AnimatePresence>
+      <div 
+        className={`fixed right-6 z-50 font-sans transition-all duration-300 ${
+          isMusicMinimized ? 'bottom-20' : 'bottom-[310px]'
+        }`}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ duration: 0.2 }}
+          className="w-[92vw] sm:w-[380px] md:w-[620px] h-[480px] md:h-[520px] bg-slate-900/95 backdrop-blur-2xl border border-slate-800/90 rounded-3xl shadow-2xl flex overflow-hidden relative"
+        >
             {/* Left Sidebar: Conversations List */}
             <div className={`w-full md:w-72 bg-slate-950/80 border-r border-slate-800/80 flex flex-col ${selectedPartner ? 'hidden md:flex' : 'flex'}`}>
               {/* Header */}
@@ -251,11 +235,11 @@ export default function ChatModal({ isOpen, onClose, activeTargetUser = null, on
                   <h3 className="text-sm font-bold text-slate-100">Hộp Thư Thoại</h3>
                 </div>
                 <button
-                  onClick={() => setIsMinimized(true)}
-                  className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                  title="Thu nhỏ"
+                  onClick={onClose}
+                  className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                  title="Đóng"
                 >
-                  <Minimize2 className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
@@ -366,13 +350,6 @@ export default function ChatModal({ isOpen, onClose, activeTargetUser = null, on
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setIsMinimized(true)}
-                        className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                        title="Thu nhỏ"
-                      >
-                        <Minimize2 className="w-4 h-4" />
-                      </button>
                       <button
                         onClick={onClose}
                         className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
@@ -517,8 +494,7 @@ export default function ChatModal({ isOpen, onClose, activeTargetUser = null, on
               )}
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      </div>
+    </AnimatePresence>
   );
 }

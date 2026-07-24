@@ -520,3 +520,36 @@ export const messageApi = {
     return apiCall(`/messages/check-permission/${partnerId}`);
   },
 };
+
+/**
+ * Music API Endpoints (YouTube Ad-Free Player)
+ */
+export const getSuggestedPlaylists = async () => {
+  try {
+    return await apiCall('/music/playlists');
+  } catch (err) {
+    console.warn('Backend music playlists API unavailable, using fallback:', err);
+    return [];
+  }
+};
+
+export const searchMusicTracks = async (query) => {
+  if (!query || !query.trim()) return [];
+  try {
+    return await apiCall(`/music/search?query=${encodeURIComponent(query)}`);
+  } catch (err) {
+    console.warn('Backend music search API failed:', err);
+    return [];
+  }
+};
+
+export const getMusicStreamUrl = async (youtubeId) => {
+  if (!youtubeId) return null;
+  try {
+    return await apiCall(`/music/stream/${youtubeId}`);
+  } catch (err) {
+    console.warn('Backend music stream URL API failed:', err);
+    return { streamUrl: null };
+  }
+};
+

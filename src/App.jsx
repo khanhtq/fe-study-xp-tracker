@@ -13,6 +13,10 @@ import Profile from './pages/Profile';
 import VerifyOtp from './pages/VerifyOtp';
 import ForgotPassword from './pages/ForgotPassword';
 
+import { MusicProvider } from './context/MusicContext';
+import MusicWidget from './components/music/MusicWidget';
+import MusicModal from './components/music/MusicModal';
+
 function MainApp() {
   const { user, token, loading } = useAuth();
   const [view, setView] = useState('landing');
@@ -116,9 +120,14 @@ export default function App() {
     <LanguageProvider>
       <ThemeProvider>
         <AuthProvider>
-          <MainApp />
+          <MusicProvider>
+            <MainApp />
+            <MusicWidget />
+            <MusicModal />
+          </MusicProvider>
         </AuthProvider>
       </ThemeProvider>
     </LanguageProvider>
   );
 }
+
