@@ -332,11 +332,13 @@ export const userApi = {
 };
 
 export const sessionApi = {
-  start: (subject) => {
+  start: (subject, studyMethod, targetDurationSeconds) => {
     if (isGuestMode()) {
       const session = {
         id: 'guest-session-' + Date.now(),
         subject: subject || '',
+        studyMethod: studyMethod || 'FREE_MODE',
+        targetDurationSeconds: targetDurationSeconds || null,
         startedAt: new Date().toISOString(),
         source: 'TIMER'
       };
@@ -345,7 +347,7 @@ export const sessionApi = {
     }
     return apiCall('/study-sessions/start', {
       method: 'POST',
-      body: JSON.stringify({ subject }),
+      body: JSON.stringify({ subject, studyMethod, targetDurationSeconds }),
     });
   },
   stop: (id) => {
@@ -357,15 +359,24 @@ export const sessionApi = {
       const durationSeconds = Math.max(0, Math.floor((now - start) / 1000));
       const minutes = durationSeconds / 60;
       const baseXp = minutes * 10;
-      const xpEarned = durationSeconds >= 1500 ? Math.round(baseXp * 1.1) : Math.round(baseXp);
+      let finalXp = durationSeconds >= 1500 ? Math.round(baseXp * 1.1) : Math.round(baseXp);
+      let isCompleted = false;
+
+      if (active.targetDurationSeconds && durationSeconds >= (active.targetDurationSeconds - 5)) {
+        isCompleted = true;
+        finalXp = Math.round(finalXp * 1.15);
+      }
 
       const finishedSession = {
         id: active.id || ('guest-session-' + Date.now()),
         subject: active.subject || '',
+        studyMethod: active.studyMethod || 'FREE_MODE',
+        targetDurationSeconds: active.targetDurationSeconds || null,
+        isCompleted,
         startedAt: active.startedAt || new Date().toISOString(),
         endedAt: new Date().toISOString(),
         durationSeconds,
-        xpEarned,
+        xpEarned: finalXp,
         source: 'TIMER'
       };
 
@@ -375,7 +386,7 @@ export const sessionApi = {
       localStorage.setItem('guest_sessions', JSON.stringify(history));
       localStorage.removeItem('guest_active_session');
 
-      updateGuestProgressWithXp(xpEarned);
+      updateGuestProgressWithXp(finalXp);
 
       return Promise.resolve(finishedSession);
     }

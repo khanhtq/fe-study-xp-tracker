@@ -5,6 +5,15 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import StudyCalendar from './StudyCalendar';
 
+const METHOD_CONFIG = {
+  FREE_MODE: { icon: '⏱️', labelKey: 'method_free' },
+  POMODORO_25_5: { icon: '🍅', labelKey: 'method_pomodoro_25_5' },
+  POMODORO_50_10: { icon: '🍅', labelKey: 'method_pomodoro_50_10' },
+  RULE_52_17: { icon: '⚡', labelKey: 'method_rule_52_17' },
+  DEEP_WORK_90_20: { icon: '🧠', labelKey: 'method_deep_work_90_20' },
+  ACTIVE_RECALL_30_10: { icon: '📝', labelKey: 'method_active_recall_30_10' },
+};
+
 function SessionHistoryList({ sessions, isGuest, onNavigateRegister }) {
   const { theme } = useTheme();
   const { language, t } = useLanguage();
@@ -180,6 +189,20 @@ function SessionHistoryList({ sessions, isGuest, onNavigateRegister }) {
                     <span className="font-bold text-slate-200 truncate">
                       {session.subject || t('timer_placeholder')}
                     </span>
+                    
+                    {session.studyMethod && METHOD_CONFIG[session.studyMethod] && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 flex items-center gap-1">
+                        <span>{METHOD_CONFIG[session.studyMethod].icon}</span>
+                        <span>{t(METHOD_CONFIG[session.studyMethod].labelKey)}</span>
+                      </span>
+                    )}
+
+                    {session.isCompleted && (
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1">
+                        <span>🎉 +15% XP</span>
+                      </span>
+                    )}
+
                     <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                       session.source === 'TIMER' 
                         ? 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20' 

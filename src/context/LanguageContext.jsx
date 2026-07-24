@@ -86,6 +86,24 @@ const translations = {
     timer_input_placeholder: "Môn học / Chủ đề (ví dụ: Toán, Lập trình...)",
     timer_btn_start: "Bắt đầu học ngay",
 
+    // study methods i18n
+    select_method_title: "Phương pháp học tập",
+    method_free: "Tự do (Stopwatch)",
+    method_pomodoro_25_5: "Pomodoro 25/5",
+    method_pomodoro_50_10: "Pomodoro 50/10",
+    method_rule_52_17: "Quy tắc 52/17",
+    method_deep_work_90_20: "Deep Work 90/20",
+    method_active_recall_30_10: "Active Recall 30/10",
+    method_free_desc: "Đếm tiến thời gian học tự do",
+    method_pomodoro_25_5_desc: "25 phút học + 5 phút nghỉ",
+    method_pomodoro_50_10_desc: "50 phút học + 10 phút nghỉ",
+    method_rule_52_17_desc: "52 phút học + 17 phút nghỉ",
+    method_deep_work_90_20_desc: "90 phút đào sâu + 20 phút nghỉ",
+    method_active_recall_30_10_desc: "30 phút tự học + 10 phút rà soát",
+    break_time_title: "Giờ Nghỉ Thư Giãn ☕",
+    break_time_desc: "Hãy thả lỏng mắt và thư giãn trước chu kỳ mới!",
+    bonus_xp_tag: "+15% XP Thưởng",
+
     // manual session
     manual_title: "Tự Ghi Nhận Buổi Học",
     subject: "Môn học",
@@ -406,6 +424,24 @@ const translations = {
     timer_ready: "Ready",
     timer_input_placeholder: "Subject / Topic (e.g. Math, Coding...)",
     timer_btn_start: "Start Focus",
+
+    // study methods i18n
+    select_method_title: "Study Method",
+    method_free: "Free (Stopwatch)",
+    method_pomodoro_25_5: "Pomodoro 25/5",
+    method_pomodoro_50_10: "Pomodoro 50/10",
+    method_rule_52_17: "52/17 Rule",
+    method_deep_work_90_20: "Deep Work 90/20",
+    method_active_recall_30_10: "Active Recall 30/10",
+    method_free_desc: "Count up study time freely",
+    method_pomodoro_25_5_desc: "25 min focus + 5 min break",
+    method_pomodoro_50_10_desc: "50 min focus + 10 min break",
+    method_rule_52_17_desc: "52 min focus + 17 min break",
+    method_deep_work_90_20_desc: "90 min focus + 20 min break",
+    method_active_recall_30_10_desc: "30 min active recall + 10 min review",
+    break_time_title: "Relaxing Break Time ☕",
+    break_time_desc: "Rest your eyes and relax before the next cycle!",
+    bonus_xp_tag: "+15% Bonus XP",
 
     // manual session
     manual_title: "Manual Session Log",
