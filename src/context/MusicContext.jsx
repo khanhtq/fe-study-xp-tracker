@@ -238,17 +238,6 @@ export const MusicProvider = ({ children }) => {
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
-      const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
-      if (
-        !hasTriggeredEndRef.current &&
-        elapsedSinceStart > 3000 &&
-        audio.duration > 0 &&
-        audio.currentTime >= audio.duration - 0.5
-      ) {
-        hasTriggeredEndRef.current = true;
-        console.log('HTML5 Audio reached end threshold, auto-nexting');
-        handleAutoNextRef.current?.();
-      }
     };
 
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
