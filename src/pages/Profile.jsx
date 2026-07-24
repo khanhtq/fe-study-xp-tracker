@@ -31,6 +31,7 @@ export default function Profile({ onBackToDashboard }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [preferredLanguage, setPreferredLanguage] = useState('en');
   const [activityStatusVisibility, setActivityStatusVisibility] = useState('EVERYONE');
+  const [messagePermission, setMessagePermission] = useState('EVERYONE');
   const [availableTitles, setAvailableTitles] = useState([]);
 
   // UI status
@@ -50,6 +51,7 @@ export default function Profile({ onBackToDashboard }) {
       setSoundEnabled(user.soundEnabled !== undefined ? user.soundEnabled : true);
       setPreferredLanguage(user.preferredLanguage || language || 'en');
       setActivityStatusVisibility(user.activityStatusVisibility || progress?.activityStatusVisibility || 'EVERYONE');
+      setMessagePermission(user.messagePermission || progress?.messagePermission || 'EVERYONE');
     }
   }, [user, progress, language]);
 
@@ -76,6 +78,7 @@ export default function Profile({ onBackToDashboard }) {
         soundEnabled,
         preferredLanguage,
         activityStatusVisibility,
+        messagePermission,
       });
       if (preferredLanguage && preferredLanguage !== language) {
         setLanguage(preferredLanguage);
@@ -642,6 +645,45 @@ export default function Profile({ onBackToDashboard }) {
                         value={opt.id}
                         checked={activityStatusVisibility === opt.id}
                         onChange={(e) => setActivityStatusVisibility(e.target.value)}
+                        className="mt-1 accent-indigo-500 cursor-pointer"
+                      />
+                      <div>
+                        <span className="text-xs font-bold text-slate-100 block">{opt.title}</span>
+                        <span className="text-[11px] text-slate-400">{opt.desc}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Message Permission Privacy Setting */}
+              <div className="pt-4 border-t border-slate-800">
+                <label className="block text-xs font-semibold text-slate-300 mb-2">
+                  <span>{t('profile_message_permission_title')}</span>
+                </label>
+                <p className="text-xs text-slate-400 mb-3">
+                  {t('profile_message_permission_desc')}
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { id: 'EVERYONE', title: t('profile_msg_everyone_title'), desc: t('profile_msg_everyone_desc') },
+                    { id: 'FRIENDS_ONLY', title: t('profile_msg_friends_title'), desc: t('profile_msg_friends_desc') },
+                    { id: 'NOBODY', title: t('profile_msg_nobody_title'), desc: t('profile_msg_nobody_desc') },
+                  ].map((opt) => (
+                    <label
+                      key={opt.id}
+                      className={`flex items-start gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                        messagePermission === opt.id
+                          ? 'bg-slate-800/90 border-indigo-500 ring-2 ring-indigo-500/30'
+                          : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="messagePermission"
+                        value={opt.id}
+                        checked={messagePermission === opt.id}
+                        onChange={(e) => setMessagePermission(e.target.value)}
                         className="mt-1 accent-indigo-500 cursor-pointer"
                       />
                       <div>

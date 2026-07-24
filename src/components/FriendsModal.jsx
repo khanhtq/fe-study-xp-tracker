@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { friendsApi, userApi, getErrorMessage } from '../api';
-import { X, Users, UserPlus, Check, Trash2, Search, UserCheck, Shield, Clock, Flame } from 'lucide-react';
+import { X, Users, UserPlus, Check, Trash2, Search, UserCheck, Shield, Clock, Flame, MessageSquare } from 'lucide-react';
 
-export default function FriendsModal({ isOpen, onClose, onViewProfile, onRefreshUserProgress }) {
+export default function FriendsModal({ isOpen, onClose, onViewProfile, onRefreshUserProgress, onOpenChat }) {
   const [activeTab, setActiveTab] = useState('friends'); // 'friends' | 'requests' | 'search'
   
   const [friends, setFriends] = useState([]);
@@ -258,13 +258,35 @@ export default function FriendsModal({ isOpen, onClose, onViewProfile, onRefresh
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => handleUnfriend(friend.userId, friend.displayName)}
-                        title="Hủy kết bạn"
-                        className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-xl transition-all cursor-pointer flex-shrink-0"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {onOpenChat && (
+                          <button
+                            onClick={() => {
+                              onOpenChat({
+                                userId: friend.userId,
+                                displayName: friend.displayName,
+                                avatarUrl: friend.avatarUrl,
+                                selectedTitle: friend.selectedTitle,
+                                currentLevel: friend.currentLevel,
+                                isOnline: friend.isOnline,
+                              });
+                              onClose();
+                            }}
+                            title="Nhắn tin"
+                            className="p-2 text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-600 rounded-xl transition-all cursor-pointer border border-indigo-500/20"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => handleUnfriend(friend.userId, friend.displayName)}
+                          title="Hủy kết bạn"
+                          className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-xl transition-all cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

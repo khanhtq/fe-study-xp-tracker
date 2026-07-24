@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authApi, userApi, sessionApi, apiCall } from '../api';
+import { authApi, userApi, sessionApi, messageApi, apiCall } from '../api';
+import { initWebSocket, subscribeToMessages, disconnectWebSocket } from '../websocket';
 
 const AuthContext = createContext(null);
 
@@ -107,6 +108,46 @@ export const AuthProvider = ({ children }) => {
     };
     initializeAuth();
   }, [token]);
+
+  // Real-time WebSocket + Background Polling + Focus event for 100% reliable message notifications
+  useEffect(() => {
+    const isGuest = localStorage.getItem('isGuest') === 'true';
+    if (!token || isGuest || !user?.id) return;
+
+    // 1. Initialize WebSocket
+    initWebSocket(user.id);
+
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await messageApi.getUnreadCount();
+        if (res && res.unreadCount !== undefined) {
+          setProgress(prev => prev ? { ...prev, unreadMessagesCount: res.unreadCount } : prev);
+        }
+      } catch (ignored) {}
+    };
+
+    fetchUnreadCount();
+
+    // 2. Real-time message listener via WebSocket
+    const unsubscribeWs = subscribeToMessages(() => {
+      fetchUnreadCount();
+    });
+
+    // 3. Window focus event listener (instant sync when user switches back to tab)
+    const handleFocus = () => {
+      fetchUnreadCount();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // 4. Fallback interval polling every 5 seconds
+    const interval = setInterval(fetchUnreadCount, 5000);
+
+    return () => {
+      unsubscribeWs();
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+  }, [token, user?.id]);
 
   const login = async (email, password) => {
     // Clear any guest flags

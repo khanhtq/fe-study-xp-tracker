@@ -479,3 +479,33 @@ export const friendsApi = {
     return apiCall(`/friends/status/${userId}`);
   },
 };
+
+export const messageApi = {
+  sendMessage: (recipientId, content) => {
+    if (isGuestMode()) return Promise.reject(new Error('Vui lòng đăng nhập để gửi tin nhắn.'));
+    return apiCall('/messages', {
+      method: 'POST',
+      body: JSON.stringify({ recipientId, content }),
+    });
+  },
+  getConversations: () => {
+    if (isGuestMode()) return Promise.resolve([]);
+    return apiCall('/messages/conversations');
+  },
+  getConversationMessages: (partnerId, page = 0, size = 30) => {
+    if (isGuestMode()) return Promise.resolve({ content: [], totalPages: 0 });
+    return apiCall(`/messages/conversations/${partnerId}?page=${page}&size=${size}`);
+  },
+  markAsRead: (partnerId) => {
+    if (isGuestMode()) return Promise.resolve();
+    return apiCall(`/messages/conversations/${partnerId}/read`, { method: 'PUT' });
+  },
+  getUnreadCount: () => {
+    if (isGuestMode()) return Promise.resolve({ unreadCount: 0 });
+    return apiCall('/messages/unread-count');
+  },
+  checkCanSend: (partnerId) => {
+    if (isGuestMode()) return Promise.resolve({ canSend: false, reason: 'Chức năng yêu cầu đăng nhập.' });
+    return apiCall(`/messages/check-permission/${partnerId}`);
+  },
+};

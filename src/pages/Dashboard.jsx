@@ -11,8 +11,9 @@ import OnlineUsersList from '../components/OnlineUsersList';
 import UserSearchModal from '../components/UserSearchModal';
 import PublicProfileModal from '../components/PublicProfileModal';
 import FriendsModal from '../components/FriendsModal';
+import ChatModal from '../components/ChatModal';
 import Footer from '../components/Footer';
-import { User, Flame, X, ShieldCheck, Search, Users } from 'lucide-react';
+import { User, Flame, X, ShieldCheck, Search, Users, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const calculateXpEarned = (durationSeconds) => {
@@ -44,6 +45,8 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatUser, setActiveChatUser] = useState(null);
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -153,14 +156,28 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/50 rounded-2xl px-3 py-1.5 text-slate-100 hover:text-purple-600 dark:hover:text-purple-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-md"
+              title="Cửa sổ nhắn tin"
+            >
+              <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="hidden sm:inline">Tin nhắn</span>
+              {progress?.unreadMessagesCount > 0 && (
+                <span className="px-1.5 py-0.5 text-[10px] bg-rose-500 text-white font-extrabold rounded-full animate-pulse">
+                  {progress.unreadMessagesCount}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={() => setIsFriendsOpen(true)}
-              className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-slate-300 hover:text-white text-xs sm:text-sm transition-all cursor-pointer shadow-md"
+              className="relative flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-md"
               title="Danh sách Bạn bè"
             >
-              <Users className="w-4 h-4 text-indigo-400" />
-              <span className="hidden sm:inline font-semibold">Bạn bè</span>
+              <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span className="hidden sm:inline">Bạn bè</span>
               {progress?.pendingFriendRequestsCount > 0 && (
                 <span className="px-1.5 py-0.5 text-[10px] bg-rose-500 text-white font-extrabold rounded-full animate-pulse">
                   {progress.pendingFriendRequestsCount}
@@ -171,17 +188,17 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
             {user?.role === 'ROLE_ADMIN' && (
               <button
                 onClick={onNavigateAdmin}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-bold transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 hover:bg-amber-500/20 text-xs font-bold transition-all"
                 title="Admin Dashboard"
               >
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
+                <ShieldCheck className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                 <span>Admin</span>
               </button>
             )}
 
             {user?.isGuest && (
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                   {t('guest_badge')}
                 </span>
                 <button
@@ -195,7 +212,7 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
 
             <button
               onClick={onNavigateProfile}
-              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-sm transition-all cursor-pointer shadow-md"
+              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-2xl px-3 py-1.5 text-sm transition-all cursor-pointer shadow-md text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-300 font-semibold"
               title="Quản lý trang cá nhân & Cài đặt"
             >
               <div className="w-6 h-6 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center text-xs text-white font-bold">
@@ -241,6 +258,10 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
             <OnlineUsersList 
               onSelectUser={(userId) => setSelectedUserId(userId)} 
               onOpenSearch={() => setIsSearchOpen(true)} 
+              onOpenChat={(targetUser) => {
+                setActiveChatUser(targetUser);
+                setIsChatOpen(true);
+              }}
             />
           </div>
 
@@ -274,6 +295,10 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
       <PublicProfileModal 
         userId={selectedUserId} 
         onClose={() => setSelectedUserId(null)} 
+        onOpenChat={(targetUser) => {
+          setActiveChatUser(targetUser);
+          setIsChatOpen(true);
+        }}
       />
 
       {/* Friends Management Modal */}
@@ -282,6 +307,18 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
         onClose={() => setIsFriendsOpen(false)}
         onViewProfile={(userId) => setSelectedUserId(userId)}
         onRefreshUserProgress={refreshProgress}
+        onOpenChat={(targetUser) => {
+          setActiveChatUser(targetUser);
+          setIsChatOpen(true);
+        }}
+      />
+
+      {/* Direct Messaging Chat Modal */}
+      <ChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        activeTargetUser={activeChatUser}
+        onSelectProfile={(userId) => setSelectedUserId(userId)}
       />
 
       {/* Session Result Toast */}

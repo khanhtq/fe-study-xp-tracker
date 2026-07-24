@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react';
 import { userApi } from '../api';
 import { useLanguage } from '../context/LanguageContext';
-import { Users, BookOpen, Clock, Loader2, Search } from 'lucide-react';
+import { Users, BookOpen, Clock, Loader2, Search, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const getFullAvatarUrl = (url) => {
@@ -14,7 +14,7 @@ const getFullAvatarUrl = (url) => {
   return `${backendOrigin}${cleanUrl}`;
 };
 
-function OnlineUserRow({ user, onSelectUser }) {
+function OnlineUserRow({ user, onSelectUser, onOpenChat }) {
   const { t } = useLanguage();
   const [elapsed, setElapsed] = useState('');
   const [liveLevel, setLiveLevel] = useState(user.currentLevel || user.baseLevel || 1);
@@ -139,17 +139,38 @@ function OnlineUserRow({ user, onSelectUser }) {
         </div>
       </div>
 
-      {user.isStudying && elapsed && (
-        <div className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-tight">
-          <Clock className="w-3 h-3 animate-spin" style={{ animationDuration: '3s' }} />
-          <span className="font-mono-timer">{elapsed}</span>
-        </div>
-      )}
+      <div className="shrink-0 flex items-center gap-2">
+        {onOpenChat && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenChat({
+                userId: user.userId,
+                displayName: user.displayName,
+                avatarUrl: user.avatarUrl,
+                currentLevel: liveLevel,
+                isOnline: true,
+              });
+            }}
+            title="Nhắn tin"
+            className="p-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/20 transition-all cursor-pointer"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+          </button>
+        )}
+        {user.isStudying && elapsed && (
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-black tracking-tight">
+            <Clock className="w-3 h-3 animate-spin" style={{ animationDuration: '3s' }} />
+            <span className="font-mono-timer">{elapsed}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function OnlineUsersList({ onSelectUser, onOpenSearch }) {
+function OnlineUsersList({ onSelectUser, onOpenSearch, onOpenChat }) {
   const { t } = useLanguage();
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -173,7 +194,7 @@ function OnlineUsersList({ onSelectUser, onOpenSearch }) {
 
   useEffect(() => {
     fetchOnlineUsers();
-    const interval = setInterval(fetchOnlineUsers, 3000); // refresh every 3 seconds
+    const interval = setInterval(fetchOnlineUsers, 6000); // refresh every 6 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -221,7 +242,7 @@ function OnlineUsersList({ onSelectUser, onOpenSearch }) {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <OnlineUserRow user={user} onSelectUser={onSelectUser} />
+                <OnlineUserRow user={user} onSelectUser={onSelectUser} onOpenChat={onOpenChat} />
               </motion.div>
             ))}
           </AnimatePresence>
