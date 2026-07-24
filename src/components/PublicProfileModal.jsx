@@ -108,32 +108,42 @@ export default function PublicProfileModal({ userId, onClose }) {
               {/* User Identity Section */}
               <div className="px-6 pb-6 pt-0 relative">
                 <div className="flex justify-between items-end -mt-12 mb-4">
-                  {/* Avatar */}
-                  <div className="relative">
-                    {profile.avatarUrl && !imgErr ? (
-                      <img
-                        src={getFullAvatarUrl(profile.avatarUrl)}
-                        alt={profile.displayName}
-                        onError={() => setImgErr(true)}
-                        className="w-24 h-24 rounded-2xl object-cover border-4 border-slate-900 shadow-xl bg-slate-800"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-800 dark:from-indigo-900 dark:to-purple-950 border-4 border-slate-900 shadow-xl flex items-center justify-center font-black text-2xl text-white dark:text-indigo-200">
-                        {initials}
-                      </div>
-                    )}
+                  {/* Avatar & Status Container */}
+                  <div className="flex items-end gap-3">
+                    <div className="shrink-0">
+                      {profile.avatarUrl && !imgErr ? (
+                        <img
+                          src={getFullAvatarUrl(profile.avatarUrl)}
+                          alt={profile.displayName}
+                          onError={() => setImgErr(true)}
+                          className="w-24 h-24 rounded-2xl object-cover border-4 border-slate-900 shadow-xl bg-slate-800"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-800 dark:from-indigo-900 dark:to-purple-950 border-4 border-slate-900 shadow-xl flex items-center justify-center font-black text-2xl text-white dark:text-indigo-200">
+                          {initials}
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Online status indicator */}
+                    {/* Online status indicator next to avatar */}
                     <div
-                      className={`absolute bottom-1 right-1 px-2 py-0.5 rounded-full text-[10px] font-black border-2 border-slate-900 flex items-center gap-1 shadow-md ${
+                      className={`px-2.5 py-1 rounded-xl text-xs font-bold border flex items-center gap-1.5 shadow-sm mb-1 ${
                         profile.isStudying
-                          ? 'bg-emerald-500 text-emerald-950 animate-pulse'
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
                           : profile.isOnline
-                          ? 'bg-indigo-500 text-white'
-                          : 'bg-slate-600 text-slate-100'
+                          ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-700 dark:text-indigo-300'
+                          : 'bg-slate-800/60 border-slate-700/60 text-slate-400'
                       }`}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          profile.isStudying
+                            ? 'bg-emerald-500 animate-pulse'
+                            : profile.isOnline
+                            ? 'bg-indigo-500'
+                            : 'bg-slate-500'
+                        }`}
+                      />
                       {profile.isStudying
                         ? t('member_status_studying')
                         : profile.isOnline
