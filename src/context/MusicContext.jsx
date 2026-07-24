@@ -39,6 +39,7 @@ export const MusicProvider = ({ children }) => {
   const playTrackRef = useRef(null);
   const handleAutoNextRef = useRef(null);
   const hasTriggeredEndRef = useRef(false);
+  const trackStartTimeRef = useRef(0);
 
   useEffect(() => {
     currentTrackRef.current = currentTrack;
@@ -66,7 +67,18 @@ export const MusicProvider = ({ children }) => {
   const playTrack = async (track, newPlaylist = null, index = 0) => {
     if (!track || !track.id) return;
 
+    // Reset track flags & timeline immediately
     hasTriggeredEndRef.current = false;
+    trackStartTimeRef.current = Date.now();
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      try {
+        audioRef.current.currentTime = 0;
+      } catch (e) { /* ignore */ }
+      audioRef.current.src = '';
+    }
+
     streamRequestRef.current?.abort();
     const controller = new AbortController();
     streamRequestRef.current = controller;
@@ -180,7 +192,8 @@ export const MusicProvider = ({ children }) => {
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
         if (data?.event === 'infoDelivery' && data?.info?.playerState === 0) {
-          if (!hasTriggeredEndRef.current) {
+          const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
+          if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
             hasTriggeredEndRef.current = true;
             console.log('YouTube iframe ENDED (playerState: 0), auto-nexting');
             handleAutoNextRef.current?.();
@@ -202,8 +215,9 @@ export const MusicProvider = ({ children }) => {
     const intervalId = window.setInterval(() => {
       setCurrentTime((time) => {
         const nextTime = time + 0.25;
+        const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
         if (duration > 0 && nextTime >= duration) {
-          if (!hasTriggeredEndRef.current) {
+          if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
             hasTriggeredEndRef.current = true;
             console.log('Embed timer reached end, auto-nexting');
             handleAutoNextRef.current?.();
@@ -224,7 +238,13 @@ export const MusicProvider = ({ children }) => {
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
-      if (!hasTriggeredEndRef.current && audio.duration > 0 && audio.currentTime >= audio.duration - 0.5) {
+      const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
+      if (
+        !hasTriggeredEndRef.current &&
+        elapsedSinceStart > 3000 &&
+        audio.duration > 0 &&
+        audio.currentTime >= audio.duration - 0.5
+      ) {
         hasTriggeredEndRef.current = true;
         console.log('HTML5 Audio reached end threshold, auto-nexting');
         handleAutoNextRef.current?.();
@@ -234,7 +254,8 @@ export const MusicProvider = ({ children }) => {
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
 
     const handleEnded = () => {
-      if (!hasTriggeredEndRef.current) {
+      const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
+      if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
         hasTriggeredEndRef.current = true;
         console.log('HTML5 Audio ended event, auto-nexting');
         handleAutoNextRef.current?.();
