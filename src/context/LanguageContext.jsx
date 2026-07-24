@@ -152,8 +152,8 @@ const translations = {
     weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 
     // landing page
-    landing_slogan: "Thăng Cấp Hành Trình Học Tập Của Bạn",
-    landing_sub: "Biến mỗi phút học tập thành điểm kinh nghiệm (XP), thăng cấp như trong game RPG và cày cuốc cùng bạn bè trực tuyến trong thời gian thực.",
+    landing_slogan: "Study Tracker - Web Theo Dõi Học Tập & Thăng Cấp XP",
+    landing_sub: "Công cụ Study Tracker miễn phí giúp biến mỗi phút học tập thành điểm kinh nghiệm (XP), thăng cấp RPG, đếm giờ Pomodoro và cày cuốc cùng bạn bè trực tuyến.",
     landing_cta_get_started: "Bắt đầu cày cuốc",
     landing_cta_login: "Đăng nhập",
     landing_cta_features: "Khám phá tính năng",
@@ -513,8 +513,8 @@ const translations = {
     weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
 
     // landing page
-    landing_slogan: "Level Up Your Learning Journey",
-    landing_sub: "Convert every minute of studying into Experience Points (XP), level up like an RPG character, and grind together with online study companions.",
+    landing_slogan: "Free Gamified Study Tracker to Level Up Your Focus",
+    landing_sub: "The best free online study tracker that converts every minute of learning into Experience Points (XP), features RPG level ups, Pomodoro timers, and real-time study rooms.",
     landing_cta_get_started: "Get Started",
     landing_cta_login: "Log In",
     landing_cta_features: "Explore Features",
