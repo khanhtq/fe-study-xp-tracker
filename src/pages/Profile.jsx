@@ -5,10 +5,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { userApi, getErrorMessage } from '../api';
 import AvatarUploader from '../components/AvatarUploader';
 import SEO from '../components/SEO';
-import { Sun, Moon, ArrowLeft, User, Shield, Trophy, Settings, Lock, Check, Globe } from 'lucide-react';
+import { Sun, Moon, ArrowLeft, User, Shield, Trophy, Settings, Lock, Check, Globe, LogOut } from 'lucide-react';
 
 export default function Profile({ onBackToDashboard }) {
-  const { user, progress, refreshUserProgress } = useAuth();
+  const { user, progress, refreshUserProgress, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
 
@@ -35,6 +35,7 @@ export default function Profile({ onBackToDashboard }) {
 
   // UI status
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -166,7 +167,7 @@ export default function Profile({ onBackToDashboard }) {
       <SEO title={t('profile_seo_title')} description={t('profile_seo_desc')} />
 
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Top Back & Theme Navigation */}
+        {/* Top Back & Theme/Logout Navigation */}
         <div className="flex items-center justify-between gap-4">
           {onBackToDashboard ? (
             <button
@@ -178,17 +179,32 @@ export default function Profile({ onBackToDashboard }) {
             </button>
           ) : <div />}
 
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-500 border border-slate-800 transition-all flex items-center justify-center cursor-pointer shadow-md"
-            title={theme === 'light' ? t('theme_dark') : t('theme_light')}
-          >
-            {theme === 'light' ? (
-              <Moon className="w-5 h-5 text-indigo-600" />
-            ) : (
-              <Sun className="w-5 h-5 text-amber-400 fill-amber-400/20" />
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-500 border border-slate-800 transition-all flex items-center justify-center cursor-pointer shadow-md"
+              title={theme === 'light' ? t('theme_dark') : t('theme_light')}
+            >
+              {theme === 'light' ? (
+                <Moon className="w-5 h-5 text-indigo-600" />
+              ) : (
+                <Sun className="w-5 h-5 text-amber-400 fill-amber-400/20" />
+              )}
+            </button>
+
+            <button
+              onClick={async () => {
+                setIsLoggingOut(true);
+                await logout();
+              }}
+              disabled={isLoggingOut}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-rose-950/60 border border-slate-800 hover:border-rose-700/50 text-rose-400 hover:text-rose-300 rounded-2xl text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+              title={t('logout')}
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">{isLoggingOut ? '...' : t('logout')}</span>
+            </button>
+          </div>
         </div>
 
         {/* Header Profile Summary */}
@@ -515,13 +531,40 @@ export default function Profile({ onBackToDashboard }) {
                 </label>
                 <select
                   value={preferredLanguage}
-                  onChange={(e) => setPreferredLanguage(e.target.value)}
+                  onChange={(e) => {
+                    setPreferredLanguage(e.target.value);
+                    setLanguage(e.target.value);
+                  }}
                   className="bg-slate-950 border border-slate-800 text-slate-100 rounded-2xl px-4 py-3 text-sm font-semibold outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
                 >
-                  <option value="en">English (English)</option>
                   <option value="vi">Tiếng Việt (Vietnamese)</option>
+                  <option value="en">English (English)</option>
                   <option value="zh">简体中文 (Chinese)</option>
                 </select>
+              </div>
+
+              {/* Theme Toggle Card */}
+              <div className="flex items-center justify-between p-4 bg-slate-950/80 border border-slate-800 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  {theme === 'light' ? (
+                    <Sun className="w-5 h-5 text-amber-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-indigo-400" />
+                  )}
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-100">
+                      {theme === 'light' ? 'Chế độ Sáng (Light Mode)' : 'Chế độ Tối (Dark Mode)'}
+                    </h4>
+                    <p className="text-xs text-slate-400">Chuyển đổi giao diện sáng hoặc tối cho hệ thống.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 transition-all cursor-pointer shadow-sm"
+                >
+                  {theme === 'light' ? t('theme_dark') : t('theme_light')}
+                </button>
               </div>
 
               <div>
@@ -608,6 +651,29 @@ export default function Profile({ onBackToDashboard }) {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Account Logout Section */}
+              <div className="pt-6 border-t border-slate-800 flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                    <LogOut className="w-4 h-4 text-rose-500" />
+                    <span>{t('logout')}</span>
+                  </h4>
+                  <p className="text-xs text-slate-400">Đăng xuất khỏi phiên đăng nhập hiện tại trên thiết bị này.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setIsLoggingOut(true);
+                    await logout();
+                  }}
+                  disabled={isLoggingOut}
+                  className="px-4 py-2.5 bg-rose-600/10 hover:bg-rose-600 border border-rose-600/30 text-rose-400 hover:text-white text-xs font-bold rounded-2xl transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>{isLoggingOut ? '...' : t('logout')}</span>
+                </button>
               </div>
 
               <div className="flex justify-end pt-4 border-t border-slate-800">

@@ -12,7 +12,7 @@ import UserSearchModal from '../components/UserSearchModal';
 import PublicProfileModal from '../components/PublicProfileModal';
 import FriendsModal from '../components/FriendsModal';
 import Footer from '../components/Footer';
-import { LogOut, User, Flame, X, Sun, Moon, ShieldCheck, Search, Users } from 'lucide-react';
+import { User, Flame, X, ShieldCheck, Search, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const calculateXpEarned = (durationSeconds) => {
@@ -35,14 +35,12 @@ const getFullAvatarUrl = (url) => {
 };
 
 export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavigateProfile }) {
-  const { user, progress, logout, refreshProgress, activeSession } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage, t } = useLanguage();
+  const { user, progress, refreshProgress, activeSession } = useAuth();
+  const { t } = useLanguage();
   const [sessions, setSessions] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [sessionToast, setSessionToast] = useState(null);
   const [liveXpProgress, setLiveXpProgress] = useState(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -224,42 +222,6 @@ export default function Dashboard({ onNavigateAdmin, onNavigateRegister, onNavig
                   {t('title_' + user.selectedTitle) || user.selectedTitle}
                 </span>
               )}
-            </button>
-
-            {/* Language Selector Dropdown */}
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-2xl px-3 py-1.5 text-sm font-semibold outline-none cursor-pointer hover:text-indigo-500 transition-colors"
-              title={t('language')}
-            >
-              <option value="vi" className="bg-slate-950 text-slate-300">Tiếng Việt</option>
-              <option value="en" className="bg-slate-950 text-slate-300">English</option>
-              <option value="zh" className="bg-slate-950 text-slate-300">简体中文</option>
-            </select>
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-500 border border-slate-800 transition-colors flex items-center justify-center cursor-pointer"
-              title={theme === 'light' ? t('theme_dark') : t('theme_light')}
-            >
-              {theme === 'light' ? (
-                <Moon className="w-5 h-5 text-indigo-600" />
-              ) : (
-                <Sun className="w-5 h-5 text-amber-400 fill-amber-400/20" />
-              )}
-            </button>
-            
-            <button
-              onClick={async () => {
-                setIsLoggingOut(true);
-                await logout();
-              }}
-              disabled={isLoggingOut}
-              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 rounded-2xl px-4 py-2 text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">{isLoggingOut ? t('loading') || '...' : t('logout')}</span>
             </button>
           </div>
         </div>
