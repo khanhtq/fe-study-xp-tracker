@@ -553,9 +553,9 @@ export default function Profile({ onBackToDashboard }) {
                   )}
                   <div>
                     <h4 className="text-sm font-semibold text-slate-100">
-                      {theme === 'light' ? 'Chế độ Sáng (Light Mode)' : 'Chế độ Tối (Dark Mode)'}
+                      {t('profile_theme_mode_title')}: {theme === 'light' ? t('profile_theme_light_label') : t('profile_theme_dark_label')}
                     </h4>
-                    <p className="text-xs text-slate-400">Chuyển đổi giao diện sáng hoặc tối cho hệ thống.</p>
+                    <p className="text-xs text-slate-400">{t('profile_theme_mode_desc')}</p>
                   </div>
                 </div>
                 <button
@@ -660,7 +660,7 @@ export default function Profile({ onBackToDashboard }) {
                     <LogOut className="w-4 h-4 text-rose-500" />
                     <span>{t('logout')}</span>
                   </h4>
-                  <p className="text-xs text-slate-400">Đăng xuất khỏi phiên đăng nhập hiện tại trên thiết bị này.</p>
+                  <p className="text-xs text-slate-400">{t('profile_logout_desc')}</p>
                 </div>
                 <button
                   type="button"
