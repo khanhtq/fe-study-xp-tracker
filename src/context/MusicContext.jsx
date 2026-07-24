@@ -98,11 +98,58 @@ export const MusicProvider = ({ children }) => {
     fetchPlaylists();
   }, []);
 
+  const currentTrackRef = useRef(currentTrack);
+  const playlistRef = useRef(playlist);
+  const playlistsRef = useRef(playlists);
+
+  useEffect(() => {
+    currentTrackRef.current = currentTrack;
+    playlistRef.current = playlist;
+    playlistsRef.current = playlists;
+  }, [currentTrack, playlist, playlists]);
+
   const handleAutoNext = useCallback(() => {
-    if (playlist.length === 0) return;
-    const nextIdx = (currentIndex + 1) % playlist.length;
-    playTrack(playlist[nextIdx], playlist, nextIdx);
-  }, [playlist, currentIndex]);
+    const activeTrack = currentTrackRef.current;
+    const activePlaylist = playlistRef.current;
+    const allPlaylists = playlistsRef.current;
+
+    let candidateTracks = [];
+
+    // 1. Tìm các bài cùng chủ đề trong playlist hiện tại (loại bỏ bài đang phát)
+    if (activePlaylist && activePlaylist.length > 0) {
+      candidateTracks = activePlaylist.filter(
+        (t) => !activeTrack || t.id !== activeTrack.id
+      );
+    }
+
+    // 2. Nếu playlist hiện tại không có bài khác (VD: phát 1 bài đơn lẻ), tìm trong danh mục tương ứng của preset
+    if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
+      const matchingPlaylist = allPlaylists.find(
+        (pl) => pl.tracks && pl.tracks.some((t) => activeTrack && t.id === activeTrack.id)
+      ) || allPlaylists[0];
+
+      if (matchingPlaylist && matchingPlaylist.tracks) {
+        candidateTracks = matchingPlaylist.tracks.filter(
+          (t) => !activeTrack || t.id !== activeTrack.id
+        );
+      }
+    }
+
+    // 3. Fallback: Nếu vẫn chưa có candidate, chọn bất kỳ bài khác bài hiện tại
+    if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
+      const allTracks = allPlaylists.flatMap((pl) => pl.tracks || []);
+      candidateTracks = allTracks.filter((t) => !activeTrack || t.id !== activeTrack.id);
+    }
+
+    if (candidateTracks.length === 0) return;
+
+    // Chọn ngẫu nhiên 1 bài cùng chủ đề nhưng khác bài hiện tại
+    const randomTrack = candidateTracks[Math.floor(Math.random() * candidateTracks.length)];
+    const targetPlaylist = activePlaylist && activePlaylist.length > 0 ? activePlaylist : [randomTrack];
+    const newIdx = targetPlaylist.findIndex((t) => t.id === randomTrack.id);
+
+    playTrack(randomTrack, targetPlaylist, newIdx >= 0 ? newIdx : 0);
+  }, []);
 
   // Update Volume
   const setVolume = (val) => {
@@ -236,10 +283,7 @@ export const MusicProvider = ({ children }) => {
 
   // Next Track
   const nextTrack = () => {
-    if (playlist.length === 0) return;
-    const nextIdx = (currentIndex + 1) % playlist.length;
-    setCurrentIndex(nextIdx);
-    playTrack(playlist[nextIdx], playlist, nextIdx);
+    handleAutoNext();
   };
 
   // Previous Track
