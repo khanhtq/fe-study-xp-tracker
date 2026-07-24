@@ -200,18 +200,20 @@ export const MusicProvider = ({ children }) => {
   useEffect(() => {
     const handleWindowMessage = (event) => {
       try {
-        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        const playerState = data?.info?.playerState ?? data?.info ?? data?.data;
-        const isEnded =
-          (data?.event === 'onStateChange' && playerState === 0) ||
-          (data?.event === 'infoDelivery' && playerState === 0) ||
-          playerState === 0;
+        let data = event.data;
+        if (typeof data === 'string') {
+          try { data = JSON.parse(data); } catch (e) { return; }
+        }
+        if (!data || typeof data !== 'object') return;
+
+        const playerState = data?.info?.playerState ?? data?.info ?? data?.playerState ?? data?.data;
+        const isEnded = playerState === 0 || playerState === '0';
 
         if (isEnded) {
           const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
-          if (!hasTriggeredEndRef.current && elapsedSinceStart > 4000) {
+          if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
             hasTriggeredEndRef.current = true;
-            console.log('YouTube iframe ENDED (playerState: 0), auto-nexting');
+            console.log('YouTube iframe ENDED (state 0), triggering handleAutoNext');
             handleAutoNextRef.current?.();
           }
         }
@@ -234,9 +236,9 @@ export const MusicProvider = ({ children }) => {
         const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
         if (duration > 0 && nextTime >= duration) {
           window.clearInterval(intervalId);
-          if (!hasTriggeredEndRef.current && elapsedSinceStart > 4000) {
+          if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
             hasTriggeredEndRef.current = true;
-            console.log('Embed timer reached end of track duration, auto-nexting');
+            console.log('Embed timer reached end of track duration, triggering handleAutoNext');
             handleAutoNextRef.current?.();
           }
           return duration;
@@ -256,17 +258,17 @@ export const MusicProvider = ({ children }) => {
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
 
-      // Chuyển bài tự động khi audio chạy gần sát điểm kết thúc (chỉ áp dụng sau khi bài đã phát > 10s)
+      // Chuyển bài tự động khi audio chạy gần sát điểm kết thúc (áp dụng sau khi phát > 5s)
       const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
       if (
         !hasTriggeredEndRef.current &&
-        audio.currentTime > 10 &&
+        audio.currentTime > 5 &&
         audio.duration > 0 &&
-        audio.currentTime >= audio.duration - 0.8 &&
-        elapsedSinceStart > 4000
+        audio.currentTime >= audio.duration - 1.0 &&
+        elapsedSinceStart > 3000
       ) {
         hasTriggeredEndRef.current = true;
-        console.log('HTML5 Audio reached end of track duration, auto-nexting');
+        console.log('HTML5 Audio reached end threshold, triggering handleAutoNext');
         handleAutoNextRef.current?.();
       }
     };
@@ -275,9 +277,9 @@ export const MusicProvider = ({ children }) => {
 
     const handleEnded = () => {
       const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
-      if (!hasTriggeredEndRef.current && elapsedSinceStart > 4000) {
+      if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
         hasTriggeredEndRef.current = true;
-        console.log('HTML5 Audio ended event naturally fired, auto-nexting');
+        console.log('HTML5 Audio ended event fired, triggering handleAutoNext');
         handleAutoNextRef.current?.();
       }
     };
