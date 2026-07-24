@@ -234,6 +234,11 @@ const translations = {
     landing_mock_user1_subject: "Đang học Toán Giải Tích",
     landing_mock_user2_subject: "Đang học Lập Trình Java",
 
+    // rank i18n
+    global_rank: "Hạng",
+    global_rank_unranked: "Chưa xếp hạng",
+    global_rank_total_users: "người dùng",
+
     // guest mode
     guest_login: "Đăng nhập Khách",
     guest_login_btn: "Vào học ngay",
@@ -649,6 +654,11 @@ const translations = {
     landing_mock_coop_title: "Studying with You",
     landing_mock_user1_subject: "Studying Calculus",
     landing_mock_user2_subject: "Studying Java Programming",
+
+    // rank i18n
+    global_rank: "Rank",
+    global_rank_unranked: "Unranked",
+    global_rank_total_users: "users",
 
     // admin dashboard en
     admin_dashboard: "Admin Dashboard",

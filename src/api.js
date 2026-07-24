@@ -552,3 +552,19 @@ export const getMusicStreamUrl = async (youtubeId, options = {}) => {
     return { streamUrl: null };
   }
 };
+
+/**
+ * Leaderboard API Endpoints (Redis ZSET)
+ */
+export const leaderboardApi = {
+  getTop: (limit = 10) => {
+    if (isGuestMode()) return Promise.resolve([]);
+    return apiCall(`/leaderboard/top?limit=${limit}`);
+  },
+  getMyRank: () => {
+    if (isGuestMode()) {
+      return Promise.resolve({ rank: 1, totalUsers: 1, totalXp: 0 });
+    }
+    return apiCall('/leaderboard/me');
+  },
+};

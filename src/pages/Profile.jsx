@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { userApi, getErrorMessage } from '../api';
+import { userApi, leaderboardApi, getErrorMessage } from '../api';
 import AvatarUploader from '../components/AvatarUploader';
 import SEO from '../components/SEO';
 import { Sun, Moon, ArrowLeft, User, Shield, Trophy, Settings, Lock, Check, Globe, LogOut } from 'lucide-react';
@@ -55,11 +55,18 @@ export default function Profile({ onBackToDashboard }) {
     }
   }, [user, progress, language]);
 
+  const [userRank, setUserRank] = useState(null);
+
   useEffect(() => {
     userApi
       .getAvailableTitles()
       .then((titles) => setAvailableTitles(titles))
       .catch((err) => console.warn('Could not load titles:', err));
+
+    leaderboardApi
+      .getMyRank()
+      .then((rankData) => setUserRank(rankData))
+      .catch((err) => console.warn('Could not load user rank:', err));
   }, []);
 
   const handleUpdateProfile = async (e) => {
@@ -213,25 +220,44 @@ export default function Profile({ onBackToDashboard }) {
         {/* Header Profile Summary */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
-            <div className="relative">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-indigo-500/30 overflow-hidden bg-slate-950 shadow-xl flex items-center justify-center text-slate-400">
-                {user?.avatarUrl ? (
-                  <img
-                    src={getFullAvatarUrl(user.avatarUrl)}
-                    alt="Avatar"
-                    className="w-full h-full object-cover rounded-full"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.displayName || 'User'}`;
-                    }}
-                  />
-                ) : (
-                  <User className="w-12 h-12" />
-                )}
+            <div className="relative flex flex-col items-center">
+              {/* Avatar circle + Level Badge outside overflow-hidden */}
+              <div className="relative">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-indigo-500/30 overflow-hidden bg-slate-950 shadow-xl flex items-center justify-center text-slate-400">
+                  {user?.avatarUrl ? (
+                    <img
+                      src={getFullAvatarUrl(user.avatarUrl)}
+                      alt="Avatar"
+                      className="w-full h-full object-cover rounded-full"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.displayName || 'User'}`;
+                      }}
+                    />
+                  ) : (
+                    <User className="w-12 h-12" />
+                  )}
+                </div>
+                {/* Level Badge - Đặt ngoài overflow-hidden để không bị cắt chữ */}
+                <span className="absolute bottom-0 right-0 z-10 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-900 shadow-md whitespace-nowrap">
+                  {t('level_short')} {progress?.currentLevel ?? user?.currentLevel ?? 1}
+                </span>
               </div>
-              <span className="absolute bottom-0 right-0 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-950 shadow">
-                {t('level_short')} {progress?.currentLevel ?? user?.currentLevel ?? 1}
-              </span>
+
+              {/* Global Rank Badge ngay dưới Avatar - Tương thích cả Light & Dark theme và Đa ngôn ngữ */}
+              {userRank && (
+                <div className="mt-3.5 inline-flex items-center gap-1.5 bg-amber-500/15 dark:bg-amber-500/10 border border-amber-600/40 dark:border-amber-500/40 text-amber-900 dark:text-amber-300 text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow-md shadow-amber-500/10 backdrop-blur-sm">
+                  <Trophy className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-amber-400/30 animate-pulse shrink-0" />
+                  <span className="whitespace-nowrap">
+                    {userRank.rank > 0 ? `${t('global_rank')} #${userRank.rank}` : t('global_rank_unranked')}
+                    {userRank.totalUsers > 0 && (
+                      <span className="text-[10px] text-amber-800/80 dark:text-amber-300/70 font-normal ml-1">
+                        ({userRank.totalUsers} {t('global_rank_total_users')})
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="text-center sm:text-left flex-1">
