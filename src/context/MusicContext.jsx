@@ -7,17 +7,18 @@ export const MusicProvider = ({ children }) => {
   const audioRef = useRef(new Audio());
   const iframeRef = useRef(null);
   const streamRequestRef = useRef(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [playlist, setPlaylist] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
-  
+
   const [volume, setVolumeState] = useState(() => {
     const saved = localStorage.getItem('study_music_volume');
     return saved !== null ? parseFloat(saved) : 0.7;
   });
   const [isMuted, setIsMuted] = useState(false);
-  
+
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [isLoadingStream, setIsLoadingStream] = useState(false);
@@ -31,56 +32,19 @@ export const MusicProvider = ({ children }) => {
   // Embed fallback: when direct stream fails, use hidden YouTube iframe
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
 
-  // The iframe fallback does not emit HTMLAudioElement timeupdate events. Keep the
-  // UI clock moving from the known track duration while YouTube plays normally.
+  // Refs for state access without stale closure issues
+  const currentTrackRef = useRef(currentTrack);
+  const playlistRef = useRef(playlist);
+  const playlistsRef = useRef(playlists);
+  const playTrackRef = useRef(null);
+  const handleAutoNextRef = useRef(null);
+  const hasTriggeredEndRef = useRef(false);
+
   useEffect(() => {
-    if (!useEmbedFallback || !isPlaying) return undefined;
-
-    const intervalId = window.setInterval(() => {
-      setCurrentTime((time) => {
-        const nextTime = time + 0.25;
-        return duration > 0 ? Math.min(nextTime, duration) : nextTime;
-      });
-    }, 250);
-
-    return () => window.clearInterval(intervalId);
-  }, [useEmbedFallback, isPlaying, duration]);
-
-  // Initialize & Listen to Audio Element Events
-  useEffect(() => {
-    const audio = audioRef.current;
-    audio.volume = isMuted ? 0 : volume;
-
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration || 0);
-    const handleEnded = () => handleAutoNext();
-    const handleError = () => {
-      // If direct stream fails during playback, try YouTube embed fallback
-      if (!useEmbedFallback && currentTrack) {
-        console.warn('Direct audio stream failed, switching to YouTube embed fallback');
-        setUseEmbedFallback(true);
-        setAudioError(null);
-        setIsPlaying(true);
-      } else {
-        setAudioError('Không thể phát bài này. Đang chuyển bài tiếp...');
-        setIsPlaying(false);
-        // Auto-skip to next after 2 seconds
-        setTimeout(() => handleAutoNext(), 2000);
-      }
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-    };
-  }, [currentIndex, playlist, volume, isMuted, useEmbedFallback, currentTrack]);
+    currentTrackRef.current = currentTrack;
+    playlistRef.current = playlist;
+    playlistsRef.current = playlists;
+  }, [currentTrack, playlist, playlists]);
 
   // Load Suggested Playlists on Mount
   useEffect(() => {
@@ -98,103 +62,11 @@ export const MusicProvider = ({ children }) => {
     fetchPlaylists();
   }, []);
 
-  const currentTrackRef = useRef(currentTrack);
-  const playlistRef = useRef(playlist);
-  const playlistsRef = useRef(playlists);
-
-  useEffect(() => {
-    currentTrackRef.current = currentTrack;
-    playlistRef.current = playlist;
-    playlistsRef.current = playlists;
-  }, [currentTrack, playlist, playlists]);
-
-  const handleAutoNext = useCallback(() => {
-    const activeTrack = currentTrackRef.current;
-    const activePlaylist = playlistRef.current;
-    const allPlaylists = playlistsRef.current;
-
-    let candidateTracks = [];
-
-    // 1. Tìm các bài cùng chủ đề trong playlist hiện tại (loại bỏ bài đang phát)
-    if (activePlaylist && activePlaylist.length > 0) {
-      candidateTracks = activePlaylist.filter(
-        (t) => !activeTrack || t.id !== activeTrack.id
-      );
-    }
-
-    // 2. Nếu playlist hiện tại không có bài khác (VD: phát 1 bài đơn lẻ), tìm trong danh mục tương ứng của preset
-    if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
-      const matchingPlaylist = allPlaylists.find(
-        (pl) => pl.tracks && pl.tracks.some((t) => activeTrack && t.id === activeTrack.id)
-      ) || allPlaylists[0];
-
-      if (matchingPlaylist && matchingPlaylist.tracks) {
-        candidateTracks = matchingPlaylist.tracks.filter(
-          (t) => !activeTrack || t.id !== activeTrack.id
-        );
-      }
-    }
-
-    // 3. Fallback: Nếu vẫn chưa có candidate, chọn bất kỳ bài khác bài hiện tại
-    if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
-      const allTracks = allPlaylists.flatMap((pl) => pl.tracks || []);
-      candidateTracks = allTracks.filter((t) => !activeTrack || t.id !== activeTrack.id);
-    }
-
-    if (candidateTracks.length === 0) return;
-
-    // Chọn ngẫu nhiên 1 bài cùng chủ đề nhưng khác bài hiện tại
-    const randomTrack = candidateTracks[Math.floor(Math.random() * candidateTracks.length)];
-    const targetPlaylist = activePlaylist && activePlaylist.length > 0 ? activePlaylist : [randomTrack];
-    const newIdx = targetPlaylist.findIndex((t) => t.id === randomTrack.id);
-
-    playTrack(randomTrack, targetPlaylist, newIdx >= 0 ? newIdx : 0);
-  }, []);
-
-  // Update Volume
-  const setVolume = (val) => {
-    const newVol = Math.max(0, Math.min(1, val));
-    setVolumeState(newVol);
-    localStorage.setItem('study_music_volume', newVol.toString());
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : newVol;
-    }
-    // Update iframe volume if in embed mode
-    if (useEmbedFallback && iframeRef.current) {
-      try {
-        iframeRef.current.contentWindow?.postMessage(
-          JSON.stringify({ event: 'command', func: 'setVolume', args: [Math.round(newVol * 100)] }),
-          '*'
-        );
-      } catch (e) { /* cross-origin, ignore */ }
-    }
-  };
-
-  const toggleMute = () => {
-    setIsMuted((prev) => {
-      const next = !prev;
-      if (audioRef.current) {
-        audioRef.current.volume = next ? 0 : volume;
-      }
-      // Mute/unmute iframe if in embed mode
-      if (useEmbedFallback && iframeRef.current) {
-        try {
-          const func = next ? 'mute' : 'unMute';
-          iframeRef.current.contentWindow?.postMessage(
-            JSON.stringify({ event: 'command', func, args: [] }),
-            '*'
-          );
-        } catch (e) { /* cross-origin, ignore */ }
-      }
-      return next;
-    });
-  };
-
   // Play a Specific Track
   const playTrack = async (track, newPlaylist = null, index = 0) => {
     if (!track || !track.id) return;
 
-    // Ignore an older request if the listener selects another track before it ends.
+    hasTriggeredEndRef.current = false;
     streamRequestRef.current?.abort();
     const controller = new AbortController();
     streamRequestRef.current = controller;
@@ -212,13 +84,11 @@ export const MusicProvider = ({ children }) => {
     }
 
     try {
-      // 1. Try getting direct stream URL from backend proxy
       const streamData = await getMusicStreamUrl(track.id, { signal: controller.signal });
       if (streamRequestRef.current !== controller) return;
       const streamUrl = streamData?.streamUrl;
 
       if (streamUrl) {
-        // Direct audio stream available — use HTML5 Audio
         const audio = audioRef.current;
         audio.src = streamUrl;
         audio.volume = isMuted ? 0 : volume;
@@ -226,7 +96,6 @@ export const MusicProvider = ({ children }) => {
         await audio.play();
         setIsPlaying(true);
       } else {
-        // No direct stream — fallback to YouTube embed iframe
         console.info(`No direct stream for ${track.id}, using YouTube embed fallback`);
         audioRef.current.pause();
         audioRef.current.src = '';
@@ -236,7 +105,6 @@ export const MusicProvider = ({ children }) => {
     } catch (err) {
       if (err.name === 'AbortError') return;
       console.error('Error fetching stream:', err);
-      // Fallback to embed on any error
       audioRef.current.pause();
       audioRef.current.src = '';
       setUseEmbedFallback(true);
@@ -248,10 +116,189 @@ export const MusicProvider = ({ children }) => {
     }
   };
 
+  playTrackRef.current = playTrack;
+
+  // Auto Next Logic: Random track from same topic, excluding current track
+  const handleAutoNext = useCallback(() => {
+    const activeTrack = currentTrackRef.current;
+    const activePlaylist = playlistRef.current;
+    const allPlaylists = playlistsRef.current;
+
+    let candidateTracks = [];
+
+    // 1. Same topic candidates from activePlaylist
+    if (activePlaylist && activePlaylist.length > 0) {
+      candidateTracks = activePlaylist.filter(
+        (t) => !activeTrack || t.id !== activeTrack.id
+      );
+    }
+
+    // 2. If single track or no candidate, find matching category in preset playlists
+    if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
+      const matchingPlaylist = allPlaylists.find(
+        (pl) => pl.tracks && pl.tracks.some((t) => activeTrack && t.id === activeTrack.id)
+      ) || allPlaylists[0];
+
+      if (matchingPlaylist && matchingPlaylist.tracks) {
+        candidateTracks = matchingPlaylist.tracks.filter(
+          (t) => !activeTrack || t.id !== activeTrack.id
+        );
+      }
+    }
+
+    // 3. Fallback to any preset track
+    if (candidateTracks.length === 0 && allPlaylists && allPlaylists.length > 0) {
+      const allTracks = allPlaylists.flatMap((pl) => pl.tracks || []);
+      candidateTracks = allTracks.filter((t) => !activeTrack || t.id !== activeTrack.id);
+    }
+
+    if (candidateTracks.length === 0) return;
+
+    // Random track from candidateTracks
+    const randomTrack = candidateTracks[Math.floor(Math.random() * candidateTracks.length)];
+    const targetPlaylist = activePlaylist && activePlaylist.length > 0 ? activePlaylist : [randomTrack];
+    const newIdx = targetPlaylist.findIndex((t) => t.id === randomTrack.id);
+
+    if (playTrackRef.current) {
+      playTrackRef.current(randomTrack, targetPlaylist, newIdx >= 0 ? newIdx : 0);
+    }
+  }, []);
+
+  handleAutoNextRef.current = handleAutoNext;
+
+  // Listen to YouTube Iframe Embed postMessage events (State 0 = ENDED)
+  useEffect(() => {
+    const handleWindowMessage = (event) => {
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data?.event === 'infoDelivery' && data?.info?.playerState === 0) {
+          if (!hasTriggeredEndRef.current) {
+            hasTriggeredEndRef.current = true;
+            console.log('YouTube iframe ENDED (playerState: 0), auto-nexting');
+            handleAutoNextRef.current?.();
+          }
+        }
+      } catch (e) {
+        /* Ignore non-JSON messages */
+      }
+    };
+
+    window.addEventListener('message', handleWindowMessage);
+    return () => window.removeEventListener('message', handleWindowMessage);
+  }, []);
+
+  // Timer for YouTube Embed Fallback UI clock & end trigger
+  useEffect(() => {
+    if (!useEmbedFallback || !isPlaying) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setCurrentTime((time) => {
+        const nextTime = time + 0.25;
+        if (duration > 0 && nextTime >= duration) {
+          if (!hasTriggeredEndRef.current) {
+            hasTriggeredEndRef.current = true;
+            console.log('Embed timer reached end, auto-nexting');
+            handleAutoNextRef.current?.();
+          }
+          return duration;
+        }
+        return nextTime;
+      });
+    }, 250);
+
+    return () => window.clearInterval(intervalId);
+  }, [useEmbedFallback, isPlaying, duration]);
+
+  // Initialize & Listen to Audio Element Events (HTML5 Audio)
+  useEffect(() => {
+    const audio = audioRef.current;
+    audio.volume = isMuted ? 0 : volume;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+      if (!hasTriggeredEndRef.current && audio.duration > 0 && audio.currentTime >= audio.duration - 0.5) {
+        hasTriggeredEndRef.current = true;
+        console.log('HTML5 Audio reached end threshold, auto-nexting');
+        handleAutoNextRef.current?.();
+      }
+    };
+
+    const handleLoadedMetadata = () => setDuration(audio.duration || 0);
+
+    const handleEnded = () => {
+      if (!hasTriggeredEndRef.current) {
+        hasTriggeredEndRef.current = true;
+        console.log('HTML5 Audio ended event, auto-nexting');
+        handleAutoNextRef.current?.();
+      }
+    };
+
+    const handleError = () => {
+      if (!useEmbedFallback && currentTrackRef.current) {
+        console.warn('Direct audio stream failed, switching to YouTube embed fallback');
+        setUseEmbedFallback(true);
+        setAudioError(null);
+        setIsPlaying(true);
+      } else {
+        setAudioError('Không thể phát bài này. Đang chuyển bài tiếp...');
+        setIsPlaying(false);
+        setTimeout(() => handleAutoNextRef.current?.(), 2000);
+      }
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+    };
+  }, [volume, isMuted, useEmbedFallback]);
+
+  // Update Volume
+  const setVolume = (val) => {
+    const newVol = Math.max(0, Math.min(1, val));
+    setVolumeState(newVol);
+    localStorage.setItem('study_music_volume', newVol.toString());
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : newVol;
+    }
+    if (useEmbedFallback && iframeRef.current) {
+      try {
+        iframeRef.current.contentWindow?.postMessage(
+          JSON.stringify({ event: 'command', func: 'setVolume', args: [Math.round(newVol * 100)] }),
+          '*'
+        );
+      } catch (e) { /* ignore */ }
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (audioRef.current) {
+        audioRef.current.volume = next ? 0 : volume;
+      }
+      if (useEmbedFallback && iframeRef.current) {
+        try {
+          const func = next ? 'mute' : 'unMute';
+          iframeRef.current.contentWindow?.postMessage(
+            JSON.stringify({ event: 'command', func, args: [] }),
+            '*'
+          );
+        } catch (e) { /* ignore */ }
+      }
+      return next;
+    });
+  };
+
   // Toggle Play / Pause
   const togglePlay = () => {
     if (!currentTrack) {
-      // Default to playing first track of first playlist
       if (playlists.length > 0 && playlists[0].tracks.length > 0) {
         playTrack(playlists[0].tracks[0], playlists[0].tracks, 0);
       }
