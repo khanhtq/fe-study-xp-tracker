@@ -74,9 +74,9 @@ export const MusicProvider = ({ children }) => {
     if (audioRef.current) {
       audioRef.current.pause();
       try {
-        audioRef.current.currentTime = 0;
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
       } catch (e) { /* ignore */ }
-      audioRef.current.src = '';
     }
 
     streamRequestRef.current?.abort();
@@ -109,16 +109,26 @@ export const MusicProvider = ({ children }) => {
         setIsPlaying(true);
       } else {
         console.info(`No direct stream for ${track.id}, using YouTube embed fallback`);
-        audioRef.current.pause();
-        audioRef.current.src = '';
+        if (audioRef.current) {
+          audioRef.current.pause();
+          try {
+            audioRef.current.removeAttribute('src');
+            audioRef.current.load();
+          } catch (e) { /* ignore */ }
+        }
         setUseEmbedFallback(true);
         setIsPlaying(true);
       }
     } catch (err) {
       if (err.name === 'AbortError') return;
       console.error('Error fetching stream:', err);
-      audioRef.current.pause();
-      audioRef.current.src = '';
+      if (audioRef.current) {
+        audioRef.current.pause();
+        try {
+          audioRef.current.removeAttribute('src');
+          audioRef.current.load();
+        } catch (e) { /* ignore */ }
+      }
       setUseEmbedFallback(true);
       setIsPlaying(true);
     } finally {
@@ -208,23 +218,14 @@ export const MusicProvider = ({ children }) => {
     return () => window.removeEventListener('message', handleWindowMessage);
   }, []);
 
-  // Timer for YouTube Embed Fallback UI clock & end trigger
+  // UI Clock Timer for YouTube Embed Fallback mode
   useEffect(() => {
     if (!useEmbedFallback || !isPlaying) return undefined;
 
     const intervalId = window.setInterval(() => {
       setCurrentTime((time) => {
         const nextTime = time + 0.25;
-        const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
-        if (duration > 0 && nextTime >= duration) {
-          if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
-            hasTriggeredEndRef.current = true;
-            console.log('Embed timer reached end, auto-nexting');
-            handleAutoNextRef.current?.();
-          }
-          return duration;
-        }
-        return nextTime;
+        return duration > 0 ? Math.min(nextTime, duration) : nextTime;
       });
     }, 250);
 
@@ -246,7 +247,7 @@ export const MusicProvider = ({ children }) => {
       const elapsedSinceStart = Date.now() - trackStartTimeRef.current;
       if (!hasTriggeredEndRef.current && elapsedSinceStart > 3000) {
         hasTriggeredEndRef.current = true;
-        console.log('HTML5 Audio ended event, auto-nexting');
+        console.log('HTML5 Audio ended event naturally fired, auto-nexting');
         handleAutoNextRef.current?.();
       }
     };
@@ -257,10 +258,6 @@ export const MusicProvider = ({ children }) => {
         setUseEmbedFallback(true);
         setAudioError(null);
         setIsPlaying(true);
-      } else {
-        setAudioError('Không thể phát bài này. Đang chuyển bài tiếp...');
-        setIsPlaying(false);
-        setTimeout(() => handleAutoNextRef.current?.(), 2000);
       }
     };
 
