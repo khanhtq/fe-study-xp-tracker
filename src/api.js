@@ -533,23 +533,22 @@ export const getSuggestedPlaylists = async () => {
   }
 };
 
-export const searchMusicTracks = async (query) => {
+export const searchMusicTracks = async (query, options = {}) => {
   if (!query || !query.trim()) return [];
   try {
-    return await apiCall(`/music/search?query=${encodeURIComponent(query)}`);
+    return await apiCall(`/music/search?query=${encodeURIComponent(query)}`, options);
   } catch (err) {
     console.warn('Backend music search API failed:', err);
     return [];
   }
 };
 
-export const getMusicStreamUrl = async (youtubeId) => {
+export const getMusicStreamUrl = async (youtubeId, options = {}) => {
   if (!youtubeId) return null;
   try {
-    return await apiCall(`/music/stream/${youtubeId}`);
+    return await apiCall(`/music/stream/${youtubeId}`, options);
   } catch (err) {
     console.warn('Backend music stream URL API failed:', err);
     return { streamUrl: null };
   }
 };
-

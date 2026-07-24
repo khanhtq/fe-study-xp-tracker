@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMusic } from '../../context/MusicContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { searchMusicTracks } from '../../api';
@@ -25,6 +25,9 @@ export default function MusicModal() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const searchRequestRef = useRef(null);
+
+  useEffect(() => () => searchRequestRef.current?.abort(), []);
 
   if (!isModalOpen) return null;
 
@@ -32,16 +35,23 @@ export default function MusicModal() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
+    searchRequestRef.current?.abort();
+    const controller = new AbortController();
+    searchRequestRef.current = controller;
     setIsSearching(true);
     setHasSearched(true);
     try {
-      const results = await searchMusicTracks(searchQuery);
+      const results = await searchMusicTracks(searchQuery, { signal: controller.signal });
+      if (searchRequestRef.current !== controller) return;
       setSearchResults(results || []);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       console.error('Search failed:', err);
       setSearchResults([]);
     } finally {
-      setIsSearching(false);
+      if (searchRequestRef.current === controller) {
+        setIsSearching(false);
+      }
     }
   };
 

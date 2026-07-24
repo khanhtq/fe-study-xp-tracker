@@ -6,6 +6,7 @@ const MusicContext = createContext(null);
 export const MusicProvider = ({ children }) => {
   const audioRef = useRef(new Audio());
   const iframeRef = useRef(null);
+  const streamRequestRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [playlist, setPlaylist] = useState([]);
@@ -29,6 +30,21 @@ export const MusicProvider = ({ children }) => {
 
   // Embed fallback: when direct stream fails, use hidden YouTube iframe
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
+
+  // The iframe fallback does not emit HTMLAudioElement timeupdate events. Keep the
+  // UI clock moving from the known track duration while YouTube plays normally.
+  useEffect(() => {
+    if (!useEmbedFallback || !isPlaying) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setCurrentTime((time) => {
+        const nextTime = time + 0.25;
+        return duration > 0 ? Math.min(nextTime, duration) : nextTime;
+      });
+    }, 250);
+
+    return () => window.clearInterval(intervalId);
+  }, [useEmbedFallback, isPlaying, duration]);
 
   // Initialize & Listen to Audio Element Events
   useEffect(() => {
@@ -130,11 +146,18 @@ export const MusicProvider = ({ children }) => {
   // Play a Specific Track
   const playTrack = async (track, newPlaylist = null, index = 0) => {
     if (!track || !track.id) return;
-    
+
+    // Ignore an older request if the listener selects another track before it ends.
+    streamRequestRef.current?.abort();
+    const controller = new AbortController();
+    streamRequestRef.current = controller;
+
     setAudioError(null);
     setUseEmbedFallback(false);
     setIsLoadingStream(true);
     setCurrentTrack(track);
+    setCurrentTime(0);
+    setDuration(track.durationSeconds || 0);
 
     if (newPlaylist) {
       setPlaylist(newPlaylist);
@@ -143,7 +166,8 @@ export const MusicProvider = ({ children }) => {
 
     try {
       // 1. Try getting direct stream URL from backend proxy
-      const streamData = await getMusicStreamUrl(track.id);
+      const streamData = await getMusicStreamUrl(track.id, { signal: controller.signal });
+      if (streamRequestRef.current !== controller) return;
       const streamUrl = streamData?.streamUrl;
 
       if (streamUrl) {
@@ -163,6 +187,7 @@ export const MusicProvider = ({ children }) => {
         setIsPlaying(true);
       }
     } catch (err) {
+      if (err.name === 'AbortError') return;
       console.error('Error fetching stream:', err);
       // Fallback to embed on any error
       audioRef.current.pause();
@@ -170,7 +195,9 @@ export const MusicProvider = ({ children }) => {
       setUseEmbedFallback(true);
       setIsPlaying(true);
     } finally {
-      setIsLoadingStream(false);
+      if (streamRequestRef.current === controller) {
+        setIsLoadingStream(false);
+      }
     }
   };
 
@@ -285,4 +312,3 @@ export const MusicProvider = ({ children }) => {
 };
 
 export const useMusic = () => useContext(MusicContext);
-
